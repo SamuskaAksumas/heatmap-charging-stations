@@ -1,6 +1,9 @@
 pandas
 geopandas
 shapely
+fiona
+pyproj
+rtree
 factor-analyzer
 scikit-learn
 matplotlib
@@ -8,5 +11,7 @@ seaborn
 plotly
 dash
 streamlit
-streamlit_folium
-Folium
+streamlit-folium
+folium
+branca
+openpyxl
