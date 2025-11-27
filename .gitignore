@@ -5,10 +5,10 @@ __pycache__/
 *.egg-info/
 .DS_Store
 
-# Large data files (add to repo manually if needed via Git LFS)
-datasets/Ladesaeulenregister.csv
-datasets/plz_einwohner.xlsx
-datasets/geodata_berlin_plz.csv
+# # Large data files (add to repo manually if needed via Git LFS)
+# datasets/Ladesaeulenregister.csv
+# datasets/plz_einwohner.xlsx
+# datasets/geodata_berlin_plz.csv
 
 # Temporary files
 tmp_*.csv
