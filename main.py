@@ -91,10 +91,11 @@ def main():
                 df_res.columns = ['plz', 'einwohner']
                 df_res['plz'] = df_res['plz'].astype(str).str.extract(r'(\d{5})')[0]
                 df_res['plz'] = pd.to_numeric(df_res['plz'], errors='coerce')
-                df_res['einwohner'] = df_res['einwohner'].astype(str).str.replace(r"[^0-9-]", "", regex=True)
+                # einwohner is numeric from Excel; convert directly without regex (regex removes decimal points)
                 df_res['einwohner'] = pd.to_numeric(df_res['einwohner'], errors='coerce').fillna(0).astype(int)
-                # aggregate in case T14 lists PLZ multiple times (by Bezirk)
-                df_residents = df_res.groupby('plz', as_index=False)['einwohner'].sum()
+                # Note: T14 lists each PLZ once per district. Each row is a unique (PLZ, district) entry.
+                # Do NOT aggregate—sum of all rows = expected total.
+                df_residents = df_res.dropna(subset=['plz'])
 
                 # attach PLZ centroid lat/lon
                 df_geodat_plz_loc = df_geodat_plz.copy()

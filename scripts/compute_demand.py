@@ -74,9 +74,12 @@ def read_residents(path_residents, df_geodat_plz):
                 df_res.columns=['plz','einwohner']
                 df_res['plz']=df_res['plz'].astype(str).str.extract(r'(\d{5})')[0]
                 df_res['plz']=pd.to_numeric(df_res['plz'], errors='coerce')
-                df_res['einwohner']=df_res['einwohner'].astype(str).str.replace(r"[^0-9-]","",regex=True)
+                # einwohner is numeric from Excel; convert directly without regex (regex removes decimal points)
                 df_res['einwohner']=pd.to_numeric(df_res['einwohner'], errors='coerce').fillna(0).astype(int)
-                df_residents = df_res.groupby('plz', as_index=False)['einwohner'].sum()
+                df_res = df_res.dropna(subset=['plz'])
+                # Note: T14 lists each PLZ once per district. Do NOT aggregate by PLZ; each row is unique.
+                # Sum of all rows = expected total (~3.9M for Berlin).
+                df_residents = df_res
                 # attach centroids
                 gdf_plz = gpd.GeoDataFrame(df_geodat_plz.copy(), geometry='geometry')
                 try:
@@ -105,12 +108,16 @@ res = read_residents(path_residents, df_geodat_plz)
 if res is None:
     raise RuntimeError('No residents data found')
 
+print(f'DEBUG: Residents returned: {len(res)} rows, sum={int(res["einwohner"].sum())}')
+
 # Merge counts and residents
 counts = df_lstat2.copy()
 counts.rename(columns={'PLZ':'plz','Number':'num_stations'}, inplace=True)
 merged = res.merge(counts, on='plz', how='left')
 merged['num_stations']=merged['num_stations'].fillna(0).astype(int)
 merged['einwohner']=merged['einwohner'].fillna(0).astype(int)
+
+print(f'DEBUG: Merged: {len(merged)} rows, sum residents={int(merged["einwohner"].sum())}')
 
 # demand metric: residents per station (use num_stations, but avoid div by zero)
 merged['res_per_station'] = merged.apply(lambda r: r['einwohner'] / r['num_stations'] if r['num_stations']>0 else float('inf'), axis=1)

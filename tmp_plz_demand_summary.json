@@ -9,140 +9,140 @@
     "out_json": "C:\\Users\\Samuska\\Documents\\Uni\\Fortgeschrittene_Softwaretechnik\\exercises\\Project_Charging_Map\\berlingeoheatmap_project1\\tmp_plz_demand_summary.json"
   },
   "summary": {
-    "total_residents": 39026450,
+    "total_residents": 3902645,
     "total_stations": 3657,
     "top_zero_stations": [
       {
         "plz": 10115.0,
-        "einwohner": 283860,
+        "einwohner": 28386,
         "num_stations": 0
       },
       {
         "plz": 14053.0,
-        "einwohner": 2120,
+        "einwohner": 212,
         "num_stations": 0
       }
     ],
     "top_high_demand": [
       {
         "plz": 12309.0,
-        "einwohner": 177320,
+        "einwohner": 17732,
         "num_stations": 1,
-        "res_per_station": 177320.0
+        "res_per_station": 17732.0
       },
       {
         "plz": 12279.0,
-        "einwohner": 175660,
+        "einwohner": 17516,
         "num_stations": 1,
-        "res_per_station": 175660.0
+        "res_per_station": 17516.0
       },
       {
         "plz": 12307.0,
-        "einwohner": 134040,
+        "einwohner": 13404,
         "num_stations": 1,
-        "res_per_station": 134040.0
+        "res_per_station": 13404.0
       },
       {
         "plz": 13439.0,
-        "einwohner": 228530,
+        "einwohner": 22853,
         "num_stations": 2,
-        "res_per_station": 114265.0
-      },
-      {
-        "plz": 10779.0,
-        "einwohner": 93340,
-        "num_stations": 1,
-        "res_per_station": 93340.0
+        "res_per_station": 11426.5
       },
       {
         "plz": 10823.0,
-        "einwohner": 89300,
+        "einwohner": 8930,
         "num_stations": 1,
-        "res_per_station": 89300.0
+        "res_per_station": 8930.0
       },
       {
         "plz": 13503.0,
-        "einwohner": 175810,
+        "einwohner": 17581,
         "num_stations": 2,
-        "res_per_station": 87905.0
+        "res_per_station": 8790.5
       },
       {
         "plz": 13059.0,
-        "einwohner": 170650,
+        "einwohner": 17065,
         "num_stations": 2,
-        "res_per_station": 85325.0
+        "res_per_station": 8532.5
       },
       {
         "plz": 13351.0,
-        "einwohner": 165820,
+        "einwohner": 16582,
         "num_stations": 2,
-        "res_per_station": 82910.0
+        "res_per_station": 8291.0
+      },
+      {
+        "plz": 10779.0,
+        "einwohner": 6798,
+        "num_stations": 1,
+        "res_per_station": 6798.0
       },
       {
         "plz": 12049.0,
-        "einwohner": 198000,
+        "einwohner": 19800,
         "num_stations": 3,
-        "res_per_station": 66000.0
+        "res_per_station": 6600.0
       },
       {
         "plz": 13505.0,
-        "einwohner": 65680,
+        "einwohner": 6568,
         "num_stations": 1,
-        "res_per_station": 65680.0
+        "res_per_station": 6568.0
       },
       {
         "plz": 14052.0,
-        "einwohner": 127820,
+        "einwohner": 12782,
         "num_stations": 2,
-        "res_per_station": 63910.0
+        "res_per_station": 6391.0
       },
       {
         "plz": 12353.0,
-        "einwohner": 357180,
+        "einwohner": 35718,
         "num_stations": 6,
-        "res_per_station": 59530.0
+        "res_per_station": 5953.0
       },
       {
         "plz": 12305.0,
-        "einwohner": 215920,
+        "einwohner": 21464,
         "num_stations": 4,
-        "res_per_station": 53980.0
+        "res_per_station": 5366.0
       },
       {
         "plz": 13435.0,
-        "einwohner": 208970,
+        "einwohner": 20897,
         "num_stations": 4,
-        "res_per_station": 52242.5
+        "res_per_station": 5224.25
       },
       {
         "plz": 13158.0,
-        "einwohner": 198840,
+        "einwohner": 19884,
         "num_stations": 4,
-        "res_per_station": 49710.0
+        "res_per_station": 4971.0
       },
       {
         "plz": 10319.0,
-        "einwohner": 277650,
+        "einwohner": 27765,
         "num_stations": 6,
-        "res_per_station": 46275.0
+        "res_per_station": 4627.5
       },
       {
         "plz": 12051.0,
-        "einwohner": 270920,
+        "einwohner": 27092,
         "num_stations": 6,
-        "res_per_station": 45153.333333333336
+        "res_per_station": 4515.333333333333
       },
       {
         "plz": 12559.0,
-        "einwohner": 192850,
+        "einwohner": 19285,
         "num_stations": 5,
-        "res_per_station": 38570.0
+        "res_per_station": 3857.0
       },
       {
         "plz": 13359.0,
-        "einwohner": 269830,
+        "einwohner": 26983,
         "num_stations": 7,
-        "res_per_station": 38547.142857142855
+        "res_per_station": 3854.714285714286
       }
     ]
   }
