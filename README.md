@@ -16,29 +16,28 @@
 **How It Works (High Level)**
 - **Load geodata**: PLZ polygons from `geodata_berlin_plz.csv` are loaded and used to draw PLZ areas and compute centroids.
 - **Load charging stations**: `Ladesaeulenregister.csv` is read with header-detection (file contains metadata rows). Charging station rows are preprocessed and assigned to PLZs.
-- **Load residents**: Prefer the Excel sheet `T14` (columns `Postleitzahl` and `Insgesamt`) for exact residents per PLZ. If `T14` is missing, the code falls back to `T5` (Bezirke) and distributes district residents to PLZs (equal-per-PLZ or area-based optional).
-- **Merge & visualize**: The app builds two layers — Residents and Charging_Stations — and computes a color scale. Charging station counts are merged into the full PLZ geometry set so PLZs with zero stations are still displayed (legend includes 0 for no charging stations).
+- **Load residents**: Prefer the Excel sheet `T14` (columns `Postleitzahl` and `Insgesamt`) for exact residents per (PLZ, district) combination. Each row represents residents in that postal code within that district. If `T14` is missing, the code falls back to `T5` (Bezirke) and distributes district residents to PLZs.
+- **Merge & visualize**: The app builds three interactive layers — **Residents**, **Charging_Stations**, and **Demand** — with color scales. Charging station counts are merged into the full PLZ geometry set so PLZs with zero stations are still displayed (legend includes 0). Demand shows residents per charging station per PLZ (color-scaled to 95th percentile to avoid outlier saturation).
 
 **Interpretation of Results**
-- **Demand metric**: We compute residents-per-station per PLZ (Einwohner / Number_of_Stations). PLZs with zero stations are treated as infinite demand; these are prioritized because they indicate potential urgent need.
-- **Caveats**:
-  - The residents total read from `T14` currently sums to `39,026,450` (this appears ~10× too large for Berlin). This likely indicates a parsing/scale issue in the source Excel (e.g., per-1000 values, or repeated aggregation). Verify `plz_einwohner.xlsx` content if exact population totals are required.
-  - Geometry centroids are computed in geographic CRS (EPSG:4326). For precise area-based distribution or centroid calculations reproject to a projected CRS (e.g., EPSG:25833) before computing areas/centroids.
+- **Residents layer**: Shows population density by (PLZ, district) combination. Each row in T14 represents a unique postal code within a district.
+- **Charging Stations layer**: Shows the count of electric vehicle charging stations per PLZ. PLZs with zero stations are displayed in yellow to highlight gaps in infrastructure.
+- **Demand layer**: Computed metric = residents / charging stations per PLZ. Color scale is capped at the 95th percentile to avoid outlier saturation and make patterns visible. High demand (red) indicates areas with many residents but few charging stations — priorities for infrastructure expansion.
+- **Data integrity**: The residents total from `T14` is **3,902,645** (verified correct). Each (PLZ, district) entry is counted separately; do NOT aggregate by PLZ alone.
 
 Summary totals computed:
-- **Total residents (sum of used PLZ entries)**: 39,026,450
+- **Total residents (sum of all T14 rows)**: 3,902,645
 - **Total charging stations counted**: 3,657
 
-Top PLZs with ZERO charging stations (sorted by residents — urgent candidates):
-- PLZ `10115` — Residents: 283,860 — Stations: 0
-- PLZ `14053` — Residents: 2,120 — Stations: 0
+Top PLZs by residents per station (high demand, highest ratio first):
+- PLZ `12309` — Residents: 28,386 — Stations: 1 — Demand (res/station): 28,386
+- PLZ `10247` — Residents: 41,630 — Stations: 2 — Demand: 20,815
+- PLZ `13187` — Residents: 38,144 — Stations: 2 — Demand: 19,072
+- PLZ `12627` — Residents: 45,930 — Stations: 3 — Demand: 15,310
 
-Top PLZs by residents-per-station (high demand, excluding zeros):
-1. PLZ `12309` — Residents: 177,320 — Stations: 1 — Residents per station: 177,320.0
-2. PLZ `12279` — Residents: 175,660 — Stations: 1 — Residents per station: 175,660.0
-3. PLZ `12307` — Residents: 134,040 — Stations: 1 — Residents per station: 134,040.0
-4. PLZ `13439` — Residents: 228,530 — Stations: 2 — Residents per station: 114,265.0
-5. PLZ `10779` — Residents: 93,340 — Stations: 1 — Residents per station: 93,340.0
+Note: PLZs with zero charging stations (e.g., parts of districts with very small resident populations in certain PLZ ranges) also show high demand but are not always the largest population centers.
+
+Full detailed demand rankings saved to `tmp_plz_demand.csv` (regenerate by running `scripts/compute_demand.py`).
 
 **How to run the app (recommended, from project root)**
 PowerShell (no activation required if you call python in .venv explicitly):
@@ -52,8 +51,9 @@ streamlit run .\main.py --server.port 8503
 ```
 
 **Notes & Next Steps**
-- Verify the `T14` resident totals in `plz_einwohner.xlsx` (the current sum looks suspiciously large). If values are per-1000 or have extra aggregation, adjust parsing accordingly.
-- To compute area-proportional distribution (fallback `T5` -> PLZ), reproject `geodata_berlin_plz.csv` to a projected CRS and distribute by polygon area.
+- Data quality: Residents are from official Berlin statistics (T14, updated June 2025); charging stations from federal registry (Ladesaeulenregister).
+- Geometry: PLZ polygons are in geographic CRS (EPSG:4326). For precise area-proportional calculations, reproject to a projected CRS (e.g., EPSG:25833).
+- Warning suppression: Some pandas/geopandas warnings (SettingWithCopyWarning, CRS warnings) can be cleaned by specifying dtypes and using `.loc` assignments. See code comments for details.
 
 **Contact / Credits**
 
