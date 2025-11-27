@@ -58,7 +58,7 @@ streamlit run .\main.py --server.port 8503
 **Contact / Credits**
 
 Team 6:
-Shoaib Ur Rehman Khan
-Chirayu Jain
-Muhammed Korkot
-Montasir Hasan Chowdhury 
+- Shoaib Ur Rehman Khan
+- Chirayu Jain
+- Muhammed Korkot
+- Montasir Hasan Chowdhury 
