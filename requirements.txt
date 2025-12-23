@@ -15,3 +15,4 @@ streamlit-folium
 folium
 branca
 openpyxl
+pytest

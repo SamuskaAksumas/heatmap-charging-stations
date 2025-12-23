@@ -1,0 +1,34 @@
+[
+  {
+    "plz": "12045",
+    "address": "Korkstraße 12",
+    "reason": "bad",
+    "id": 1,
+    "timestamp": "2025-12-22T15:06:27.791870"
+  },
+  {
+    "plz": "12045",
+    "address": "Korkstraße 11",
+    "reason": "badder",
+    "id": 2,
+    "timestamp": "2025-12-22T15:06:45.146856"
+  },
+  {
+    "plz": "12345",
+    "address": "123123",
+    "reason": "12312",
+    "id": 3,
+    "timestamp": "2025-12-22T15:09:13.233471"
+  },
+  {
+    "plz": "10000",
+    "address": "asda",
+    "reason": "adada",
+    "id": 4,
+    "timestamp": "2025-12-22T15:13:10.437428",
+    "status": "rejected",
+    "reviewed_by": "Admin",
+    "review_date": "2025-12-22T15:21:15.525688",
+    "review_notes": ""
+  }
+]
