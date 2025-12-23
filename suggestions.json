@@ -4,7 +4,11 @@
     "address": "Korkstraße 12",
     "reason": "bad",
     "id": 1,
-    "timestamp": "2025-12-22T15:06:27.791870"
+    "timestamp": "2025-12-22T15:06:27.791870",
+    "status": "approved",
+    "reviewed_by": "Admin",
+    "review_date": "2025-12-23T16:12:21.459539",
+    "review_notes": ""
   },
   {
     "plz": "12045",
@@ -30,5 +34,16 @@
     "reviewed_by": "Admin",
     "review_date": "2025-12-22T15:21:15.525688",
     "review_notes": ""
+  },
+  {
+    "plz": "12345",
+    "address": "123",
+    "reason": "1231221312",
+    "id": 5,
+    "timestamp": "2025-12-23T16:11:40.663313",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
   }
 ]
