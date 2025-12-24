@@ -24,7 +24,29 @@
    - Displays map and data statistics in Streamlit UI
    - Timing and diagnostics via `HelperTools.py`
 
-2. **`config.py`** (Configuration)
+2. **Source Code (`/src`) — Domain-Driven Architecture**
+The `src` folder is organized into layers to separate data models, business logic, and infrastructure.
+
+* **Domain Entities (`src/domain/entities/`)**
+    * *Defines the data structures and blueprints used across the application.*
+    * **`charging_station.py`**: Model representing charging station attributes.
+    * **`demand_result.py`**: Model for storing calculated demand metrics per PLZ.
+    * **`resident_data.py`**: Model representing population counts and geographic keys.
+    * **`suggestion.py`**: Defines the `ChargingSuggestion` class for user requests.
+
+* **Domain Events (`src/domain/events/`)**
+    * *Contains the specific business logic and data workflows triggered by the application.*
+    * **`demand_calculated.py`**: Logic for the "Exact View" demand formula ($Residents / Stations$).
+    * **`load_suggestion.py`**: Utility for loading suggestions from the persistence layer.
+    * **`residents_processed.py`**: Logic for handling raw resident data.
+    * **`stations_processed.py`**: Logic for filtering and grouping charging station registry data.
+    * **`suggestion_handled.py`**: Orchestrates saving suggestions, assigning IDs, and setting default statuses.
+
+* **Infrastructure (`src/infrastructure/`)**
+    * *Handles low-level operations and data access.*
+    * **`readers.py`**: Functions to read CSV/Excel files (e.g., handling metadata headers in the charging registry).
+
+3. **`config.py`** (Configuration)
    - Defines `pdict` dictionary with key file paths and column names:
      - `'geodata_plz_file'`: path to `geodata_berlin_plz.csv`
      - `'charging_stations_file'`: path to `Ladesaeulenregister.csv`
@@ -32,7 +54,7 @@
      - `'bezirke_file'`: path to shapefile for fallback
      - `'geocode_key'`: column name used for grouping (`PLZ`)
 
-3. **`core/methods.py`** (Data Processing & Visualization)
+4. **`core/methods.py`** (Data Processing & Visualization)
    - **`sort_by_plz_add_geometry()`**: Loads PLZ polygons from `geodata_berlin_plz.csv`, parses WKT geometries, computes centroids
    - **`preprop_resid()`**: Reads `plz_einwohner.xlsx` sheet `T14`, detects header rows, aggregates residents by PLZ
    - **`preprop_lstat()`**: Reads `Ladesaeulenregister.csv` with metadata header detection, filters for valid charging stations, assigns to PLZs via geocoding
@@ -42,17 +64,27 @@
      - Builds three interactive folium layers with popups showing PLZ, district, count, and demand ratio
      - Returns folium map object for display in Streamlit
 
-4. **`core/HelperTools.py`** (Utilities)
+5. **`core/HelperTools.py`** (Utilities)
    - `get_current_time()`: Timing and execution logging
    - Simple utilities for consistent formatting
 
-5. **`scripts/compute_demand.py`** (Standalone Demand Computation)
+6. **`scripts/compute_demand.py`** (Standalone Demand Computation)
    - Reads residents from `T14` and charging stations from registry
    - Computes demand metric (residents / stations per PLZ)
    - Generates `tmp_plz_demand.csv` (all PLZs ranked by demand)
    - Generates `tmp_plz_demand_summary.json` (summary statistics: mean, median, 95th percentile, top PLZs)
    - Run independently with: `python scripts/compute_demand.py`
 
+7. **Testing Suite (`/tests`)**
+We use **Pytest** with advanced mocking to ensure code reliability without modifying real data.
+
+* **Demand Logic**: 
+    * *Boundary Testing*: Verifies that 0 stations return the full population as demand.
+    * *Exact View*: Ensures $500 \div 5 = 100.0$.
+* **Suggestion Logic**:
+    * *Mocking*: Uses `unittest.mock` to simulate the file system.
+    * *Isolation*: Patches `load_suggestions` to avoid reading real production data.
+    * *Validation*: Confirms new entries default to `status: pending`.
 ---
 
 ## **Data Format & Column Requirements**
@@ -147,6 +179,20 @@ Or activate the venv then run:
 streamlit run .\main.py --server.port 8503
 ```
 
+**Testing the Application**
+
+We utilize `pytest` to ensure the reliability of our business logic and persistence layers.
+
+**Run All Tests:**
+```
+python3 -m pytest
+```
+
+**Run a Specific Test Suite:** For example, to test only the Demand Logic:
+```
+python3 -m pytest tests/demand/test_demand_logic.py
+```
+
 **Notes**
 - Data quality: Residents are from official Berlin statistics (T14, updated June 2025); charging stations from federal registry (Ladesaeulenregister).
 - Geometry: PLZ polygons are in geographic CRS (EPSG:4326). For precise area-proportional calculations, reproject to a projected CRS (e.g., EPSG:25833).
@@ -155,7 +201,7 @@ streamlit run .\main.py --server.port 8503
 **Contact / Credits**
 
 Team 6:
+- Muhammed Korkot
 - Shoaib Ur Rehman Khan
 - Chirayu Jain
-- Muhammed Korkot
 - Montasir Hasan Chowdhury 

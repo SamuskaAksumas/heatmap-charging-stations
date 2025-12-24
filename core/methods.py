@@ -11,8 +11,8 @@ from branca.colormap import LinearColormap
 import json
 import os
 from datetime import datetime
-
-
+from src.domain.events.suggestion_handled import save_suggestion
+from src.domain.events.load_suggestion import load_suggestions
 
 def sort_by_plz_add_geometry(dfr, dfg, pdict): 
     dframe                  = dfr.copy()
@@ -70,34 +70,6 @@ def count_plz_occurrences(df_lstat2):
     ).reset_index()
     
     return result_df
-
-
-def load_suggestions():
-    """Load suggestions from JSON file"""
-    suggestions_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'suggestions.json')
-    if os.path.exists(suggestions_file):
-        try:
-            with open(suggestions_file, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        except:
-            return []
-    return []
-
-
-def save_suggestion(suggestion):
-    """Save a new suggestion to JSON file"""
-    suggestions = load_suggestions()
-    suggestion['id'] = len(suggestions) + 1
-    suggestion['timestamp'] = datetime.now().isoformat()
-    suggestion['status'] = 'pending'  # pending, approved, rejected
-    suggestion['reviewed_by'] = None
-    suggestion['review_date'] = None
-    suggestion['review_notes'] = None
-    suggestions.append(suggestion)
-
-    suggestions_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'suggestions.json')
-    with open(suggestions_file, 'w', encoding='utf-8') as f:
-        json.dump(suggestions, f, indent=2, ensure_ascii=False)
 
 
 def review_suggestion(suggestion_id, status, reviewer="Admin", notes=""):
@@ -200,175 +172,87 @@ def preprop_resid(dfr, dfg, pdict):
 # -----------------------------------------------------------------------------
 @ht.timer
 def make_streamlit_electric_Charging_resid(dfr1, dfr2):
-    """Makes Streamlit App with Heatmap of Electric Charging Stations and Residents"""
+    """
+    UI Presentation Layer: 
+    Displays the interactive map based on pre-calculated demand and station data.
+    """
+    # 1. Standardize column names for the UI to match our Entities
+    # Ensuring we use the results from our on_demand_calculated event
+    dframe_stations = dfr1.copy()
+    dframe_analysis = dfr2.copy()
 
-    dframe1 = dfr1.copy()
-    dframe2 = dfr2.copy()
-
-
-    # Streamlit app
     st.title('Heatmaps: Electric Charging Stations and Residents')
 
     # Add tabs for different functionalities
     tab1, tab2, tab3 = st.tabs(["Map View", "Suggest Location", "View Suggestions"])
 
     with tab1:
-        # Create a radio button for layer selection
-        # layer_selection = st.radio("Select Layer", ("Number of Residents per PLZ (Postal code)", "Number of Charging Stations per PLZ (Postal code)"))
-
         layer_selection = st.radio("Select Layer", ("Residents", "Charging_Stations", "Demand"))
 
-        # Create a Folium map
+        # Create a Folium map centered on Berlin
         m = folium.Map(location=[52.52, 13.40], zoom_start=10)
 
+        # --- LAYER: RESIDENTS ---
         if layer_selection == "Residents":
+            # Uses 'einwohner' column from our ResidentRecord entity
+            color_map = LinearColormap(
+                colors=['yellow', 'red'], 
+                vmin=dframe_analysis['Einwohner'].min(), 
+                vmax=dframe_analysis['Einwohner'].max()
+            )
 
-            # Create a color map for Residents
-            color_map = LinearColormap(colors=['yellow', 'red'], vmin=dframe2['Einwohner'].min(), vmax=dframe2['Einwohner'].max())
-
-            # Add polygons to the map for Residents
-            for idx, row in dframe2.iterrows():
+            for idx, row in dframe_analysis.iterrows():
                 folium.GeoJson(
                     row['geometry'],
                     style_function=lambda x, color=color_map(row['Einwohner']): {
-                        'fillColor': color,
-                        'color': 'black',
-                        'weight': 1,
-                        'fillOpacity': 0.7
+                        'fillColor': color, 'color': 'black', 'weight': 1, 'fillOpacity': 0.7
                     },
                     tooltip=f"PLZ: {row['PLZ']}, Einwohner: {row['Einwohner']}"
                 ).add_to(m)
 
-            # Display the dataframe for Residents
-            # st.subheader('Residents Data')
-            # st.dataframe(gdf_residents2)
+        # --- LAYER: CHARGING STATIONS ---
+        elif layer_selection == "Charging_Stations":
+            # Uses 'count' column from our StationCount entity
+            vmin = int(dframe_stations['Number'].min()) if 'Number' in dframe_stations.columns else 0
+            vmax = int(dframe_stations['Number'].max()) if 'Number' in dframe_stations.columns else 1
 
-        else:
-            # Build full PLZ GeoDataFrame (use residents geometries) and merge counts so zeros are explicit
-            try:
-                full_gdf = dframe2[['PLZ', 'geometry']].merge(dframe1[['PLZ', 'Number']], on='PLZ', how='left')
-                full_gdf['Number'] = full_gdf['Number'].fillna(0).astype(int)
-            except Exception:
-                full_gdf = dframe1.copy()
-                if 'Number' in full_gdf.columns:
-                    full_gdf['Number'] = full_gdf['Number'].fillna(0).astype(int)
-                else:
-                    full_gdf['Number'] = 0
-
-            # compute colormap vmin/vmax from full_gdf to include zeros
-            vmin = int(full_gdf['Number'].min()) if 'Number' in full_gdf.columns else 0
-            vmax = int(full_gdf['Number'].max()) if 'Number' in full_gdf.columns else 1
             color_map = LinearColormap(colors=['yellow', 'red'], vmin=vmin, vmax=vmax)
 
-            for idx, row in full_gdf.iterrows():
-                num = int(row['Number']) if 'Number' in row and pd.notna(row['Number']) else 0
+            for idx, row in dframe_stations.iterrows():
                 folium.GeoJson(
                     row['geometry'],
-                    style_function=lambda x, color=color_map(num): {
-                        'fillColor': color,
-                        'color': 'black',
-                        'weight': 1,
-                        'fillOpacity': 0.7
+                    style_function=lambda x, color=color_map(row['Number']): {
+                        'fillColor': color, 'color': 'black', 'weight': 1, 'fillOpacity': 0.7
                     },
-                    tooltip=f"PLZ: {row.get('PLZ', '')}, Number: {num}"
+                    tooltip=f"PLZ: {row['PLZ']}, Stations: {row['Number']}"
                 ).add_to(m)
 
-            # Display the dataframe for Numbers
-            # st.subheader('Numbers Data')
-            # st.dataframe(gdf_lstat3)
-
-        if layer_selection == "Demand":
-            # Build full PLZ GeoDataFrame merging residents + station counts
-            try:
-                # detect residents column name in the residents GeoDataFrame
-                res_col = None
-                for c in dframe2.columns:
-                    if str(c).lower().startswith('einw') or 'einw' in str(c).lower():
-                        res_col = c
-                        break
-
-                if res_col is not None:
-                    temp_res = dframe2[['PLZ', 'geometry', res_col]].rename(columns={res_col: 'Einwohner'})
-                else:
-                    temp_res = dframe2[['PLZ', 'geometry']].copy()
-                    temp_res['Einwohner'] = 0
-
-                full_gdf = temp_res.merge(dframe1[['PLZ', 'Number']], on='PLZ', how='left')
-                full_gdf['Number'] = full_gdf['Number'].fillna(0).astype(int)
-                full_gdf['Einwohner'] = full_gdf['Einwohner'].fillna(0).astype(int)
-            except Exception:
-                # Fallback: try to build from available frames
-                full_gdf = dframe2.copy()
-                if 'PLZ' in dframe1.columns and 'Number' in dframe1.columns:
-                    counts = dframe1[['PLZ', 'Number']].copy()
-                    full_gdf = full_gdf.merge(counts, on='PLZ', how='left')
-                if 'Number' not in full_gdf.columns:
-                    full_gdf['Number'] = 0
-                if 'Einwohner' not in full_gdf.columns:
-                    full_gdf['Einwohner'] = 0
-
-            # Demand: residents per station; if zero stations, use residents (marks high demand)
-            def compute_demand(row):
-                if row['Number'] > 0:
-                    return row['Einwohner'] / row['Number']
-                else:
-                    # treat zero-station PLZ as high-demand equal to residents
-                    return float(row['Einwohner'])
-
-            full_gdf['demand'] = full_gdf.apply(compute_demand, axis=1)
-
-            # Replace infinite or NaN
-            full_gdf['demand'] = full_gdf['demand'].replace([np.inf, -np.inf], np.nan).fillna(0)
-
-            # Color scaling: vmin 0, vmax = 95th percentile to avoid outlier saturation
-            vmax = int(np.nanpercentile(full_gdf['demand'].replace(0, np.nan).dropna(), 95)) if full_gdf['demand'].notna().any() else int(full_gdf['demand'].max() or 1)
-            if vmax <= 0:
-                vmax = int(full_gdf['demand'].max() or 1)
+        # --- LAYER: DEMAND ---
+        elif layer_selection == "Demand":
+            # USES PRE-CALCULATED 'demand' column from our DemandResult entity
+            # We only keep the visual "vmax" logic here to handle outliers
+            vmax = int(np.nanpercentile(dframe_analysis['demand'].replace(0, np.nan).dropna(), 95)) \
+                   if dframe_analysis['demand'].notna().any() else 1
+            
             color_map = LinearColormap(colors=['yellow', 'red'], vmin=0, vmax=vmax)
 
-            # Draw PLZ polygons with color corresponding to demand
-            for idx, row in full_gdf.iterrows():
-                val = float(row['demand']) if 'demand' in row and pd.notna(row['demand']) else 0.0
-                # Cap display value for color lookup to vmax so legend remains readable
-                display_val = min(val, vmax)
+            for idx, row in dframe_analysis.iterrows():
+                val = float(row['demand'])
+                display_val = min(val, vmax) # Cap visual color at 95th percentile
+                
                 folium.GeoJson(
                     row['geometry'],
                     style_function=lambda x, color=color_map(display_val): {
-                        'fillColor': color,
-                        'color': 'black',
-                        'weight': 1,
-                        'fillOpacity': 0.7
+                        'fillColor': color, 'color': 'black', 'weight': 1, 'fillOpacity': 0.7
                     },
-                    tooltip=f"PLZ: {row.get('PLZ', '')}, Demand: {val:.1f} (res/station)"
+                    tooltip=f"PLZ: {row['PLZ']}, Demand: {val:.1f} (res/station)"
                 ).add_to(m)
-
-            # Add color map legend
+            
             color_map.caption = 'Residents per charging station (capped at 95th percentile)'
-            color_map.add_to(m)
 
-        # Add color map to the map
+        # Add common map elements
         color_map.add_to(m)
-
-        # Add community suggestions to the map (only approved ones)
-        suggestions = load_suggestions()
-        approved_suggestions = [s for s in suggestions if s.get('status') == 'approved']
-        if approved_suggestions:
-            suggestion_group = folium.FeatureGroup(name="Approved Community Suggestions", show=False)
-            for suggestion in approved_suggestions:
-                plz = suggestion.get('plz', '')
-                lat, lon = get_plz_centroid(plz, dframe2)
-                if lat is not None and lon is not None:
-                    folium.Marker(
-                        location=[lat, lon],
-                        popup=f"<b>Approved Suggestion</b><br>PLZ: {plz}<br>Address: {suggestion.get('address', 'N/A')}<br>Reason: {suggestion.get('reason', 'N/A')}",
-                        icon=folium.Icon(color='green', icon='check-circle', prefix='fa')
-                    ).add_to(suggestion_group)
-            suggestion_group.add_to(m)
-
-        # Add layer control
         folium.LayerControl().add_to(m)
-
-        # Display the map
         folium_static(m)
 
         with tab2:
