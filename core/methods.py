@@ -422,6 +422,7 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
                 st.success("Admin mode unlocked ✅")
             else:
                 admin_mode = False
+                st.info("Enter the correct admin password to unlock review features.")
             # ------------------------------------------
 
             suggestions = load_suggestions()
