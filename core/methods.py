@@ -414,8 +414,15 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
             st.header("Community Suggestions")
             st.write("See suggestions from the community for new charging locations.")
 
-            # Admin review mode
-            admin_mode = st.checkbox("Enable Admin Review Mode")
+            # --- CHANGED: Admin password protection ---
+            admin_password = st.text_input("Enter Admin Password to review", type="password")
+            
+            if admin_password == "advanced":
+                admin_mode = True
+                st.success("Admin mode unlocked ✅")
+            else:
+                admin_mode = False
+            # ------------------------------------------
 
             suggestions = load_suggestions()
 
@@ -457,7 +464,7 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
                                 if suggestion.get('review_notes'):
                                     st.caption(f"Notes: {suggestion['review_notes']}")
 
-                            # Admin review buttons
+                            # Admin review buttons (Only visible if admin_mode is True)
                             if admin_mode and status == 'pending':
                                 col1, col2, col3 = st.columns(3)
                                 with col1:
