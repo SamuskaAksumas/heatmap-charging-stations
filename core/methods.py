@@ -11,8 +11,11 @@ from branca.colormap import LinearColormap
 import json
 import os
 from datetime import datetime
-from src.domain.events.suggestion_handled import save_suggestion
-from src.domain.events.load_suggestion import load_suggestions
+from src.suggestion.application.services.SuggestionService import SuggestionService
+from src.suggestion.infrastructure.repositories.suggestion_repository import SuggestionRepository
+from src.demand.domain.events.display_demand import display_demand
+from src.demand.infrastructure.respositories.demand_repository import DemandRepository
+from src.demand.application.services.demandServices import DemandService
 
 def sort_by_plz_add_geometry(dfr, dfg, pdict): 
     dframe                  = dfr.copy()
@@ -72,16 +75,16 @@ def count_plz_occurrences(df_lstat2):
     return result_df
 
 
-def review_suggestion(suggestion_id, status, reviewer="Admin", notes=""):
-    """Review a suggestion (approve/reject)"""
-    suggestions = load_suggestions()
-    for suggestion in suggestions:
-        if suggestion.get('id') == suggestion_id:
-            suggestion['status'] = status
-            suggestion['reviewed_by'] = reviewer
-            suggestion['review_date'] = datetime.now().isoformat()
-            suggestion['review_notes'] = notes
-            break
+# def review_suggestion(suggestion_id, status, reviewer="Admin", notes=""):
+#     """Review a suggestion (approve/reject)"""
+#     suggestions = load_suggestions()
+#     for suggestion in suggestions:
+#         if suggestion.get('id') == suggestion_id:
+#             suggestion['status'] = status
+#             suggestion['reviewed_by'] = reviewer
+#             suggestion['review_date'] = datetime.now().isoformat()
+#             suggestion['review_notes'] = notes
+#             break
 
     suggestions_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'suggestions.json')
     with open(suggestions_file, 'w', encoding='utf-8') as f:
@@ -171,11 +174,15 @@ def preprop_resid(dfr, dfg, pdict):
 
 # -----------------------------------------------------------------------------
 @ht.timer
-def make_streamlit_electric_Charging_resid(dfr1, dfr2):
+def make_streamlit_electric_Charging_resid(dfr1, dfr2, demand_service):
     """
     UI Presentation Layer: 
     Displays the interactive map based on pre-calculated demand and station data.
     """
+    suggestion_repo = SuggestionRepository()
+    suggestion_service = SuggestionService(suggestion_repo)
+
+    suggestions = suggestion_service.get_all_suggestions()
     # 1. Standardize column names for the UI to match our Entities
     # Ensuring we use the results from our on_demand_calculated event
     dframe_stations = dfr1.copy()
@@ -231,27 +238,12 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
         elif layer_selection == "Demand":
             # USES PRE-CALCULATED 'demand' column from our DemandResult entity
             # We only keep the visual "vmax" logic here to handle outliers
-            vmax = int(np.nanpercentile(dframe_analysis['demand'].replace(0, np.nan).dropna(), 95)) \
-                   if dframe_analysis['demand'].notna().any() else 1
-            
-            color_map = LinearColormap(colors=['yellow', 'red'], vmin=0, vmax=vmax)
-
-            for idx, row in dframe_analysis.iterrows():
-                val = float(row['demand'])
-                display_val = min(val, vmax) # Cap visual color at 95th percentile
-                
-                folium.GeoJson(
-                    row['geometry'],
-                    style_function=lambda x, color=color_map(display_val): {
-                        'fillColor': color, 'color': 'black', 'weight': 1, 'fillOpacity': 0.7
-                    },
-                    tooltip=f"PLZ: {row['PLZ']}, Demand: {val:.1f} (res/station)"
-                ).add_to(m)
-            
-            color_map.caption = 'Residents per charging station (capped at 95th percentile)'
-
-        # Add common map elements
-        color_map.add_to(m)
+            # display_demand(m, dframe_analysis)
+            analysis_data = demand_service.get_latest_results()
+            if analysis_data is not None:
+                display_demand(m, analysis_data)
+            else:
+                st.warning("Please run the calculation first or check data sources.")
         folium.LayerControl().add_to(m)
         folium_static(m)
 
@@ -286,7 +278,11 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
                                     "address": address.strip(),
                                     "reason": reason.strip()
                                 }
-                                save_suggestion(suggestion)
+                                suggestion_service.create_suggestion(
+                                    plz = plz.strip(), 
+                                    address = address.strip(), 
+                                    reason = reason.strip()
+                                )
                                 st.success("✅ Thank you! Your suggestion has been submitted and will be reviewed.")
                                 st.balloons()
                             else:
@@ -296,6 +292,7 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
 
         with tab3:
             st.header("Community Suggestions")
+            suggestions = suggestion_service.get_all_suggestions()
             st.write("See suggestions from the community for new charging locations.")
 
             # --- CHANGED: Admin password protection ---
@@ -308,8 +305,6 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
                 admin_mode = False
                 st.info("Enter the correct admin password to unlock review features.")
             # ------------------------------------------
-
-            suggestions = load_suggestions()
 
             if not suggestions:
                 st.info("No suggestions yet. Be the first to suggest a new charging location!")
@@ -354,18 +349,18 @@ def make_streamlit_electric_Charging_resid(dfr1, dfr2):
                                 col1, col2, col3 = st.columns(3)
                                 with col1:
                                     if st.button(f"✅ Approve #{suggestion['id']}", key=f"approve_{suggestion['id']}"):
-                                        review_suggestion(suggestion['id'], 'approved', 'Admin')
+                                        suggestion_service.review_suggestion(suggestion['id'], 'approved', 'Admin')
                                         st.success("Suggestion approved!")
                                         st.rerun()
                                 with col2:
                                     if st.button(f"❌ Reject #{suggestion['id']}", key=f"reject_{suggestion['id']}"):
-                                        review_suggestion(suggestion['id'], 'rejected', 'Admin')
+                                        suggestion_service.review_suggestion(suggestion['id'], 'rejected', 'Admin')
                                         st.success("Suggestion rejected!")
                                         st.rerun()
                                 with col3:
                                     notes = st.text_input(f"Notes for #{suggestion['id']}", key=f"notes_{suggestion['id']}")
                                     if st.button(f"💬 Add Notes #{suggestion['id']}", key=f"add_notes_{suggestion['id']}"):
-                                        review_suggestion(suggestion['id'], status, 'Admin', notes)
+                                        suggestion_service.review_suggestion(suggestion['id'], status, 'Admin', notes)
                                         st.success("Notes added!")
                                         st.rerun()
 

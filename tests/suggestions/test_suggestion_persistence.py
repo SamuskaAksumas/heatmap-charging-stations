@@ -1,41 +1,48 @@
-import json
 import pytest
-from unittest.mock import patch, mock_open
-from src.domain.events.suggestion_handled import save_suggestion
+from src.suggestion.application.services.SuggestionService import SuggestionService
+from src.suggestion.infrastructure.repositories.in_memory_suggestion_repository import InMemorySuggestionRepository
 
-def test_suggestion_save_event():
-    """
-    The Ultimate Standard: Mocking 'open' so we don't touch the real JSON file.
-    """
-    sample_input = {
-        "plz": "10117",
-        "address": "Friedrichstraße",
-        "reason": "High traffic area"
-    }
+@pytest.fixture
+def suggestion_setup():
+    """Fixture to provide a clean service and in-memory repo for every test."""
+    repo = InMemorySuggestionRepository()
+    service = SuggestionService(repo)
+    return service, repo
 
-    # We mock 'open' and 'load_suggestions'
-    # 1. load_suggestions returns [] so we start fresh
-    # 2. mock_open captures everything written to the file
-    with patch("src.domain.events.suggestion_handled.load_suggestions", return_value=[]), \
-         patch("builtins.open", mock_open()) as mocked_file:
-        
-        # ACT
-        save_suggestion(sample_input)
-        
-        # ASSERT
-        # Verify that 'open' was called to write ('w') the file
-        mocked_file.assert_called()
-        
-        # Get the data that was actually "written" to the fake file
-        # We combine all chunks written to the file into one string
-        handle = mocked_file()
-        written_data = "".join(call.args[0] for call in handle.write.call_args_list)
-        
-        # Parse it back to JSON to check the content
-        saved_json = json.loads(written_data)
-        
-        assert len(saved_json) == 1
-        assert saved_json[0]['plz'] == "10117"
-        assert saved_json[0]['status'] == "pending"
-        assert "id" in saved_json[0]
-        assert "timestamp" in saved_json[0]
+def test_create_suggestion_integration(suggestion_setup):
+    # 1. ARRANGE
+    service, repo = suggestion_setup
+    plz = "10117"
+    address = "Friedrichstraße"
+    reason = "High traffic area"
+
+    # 2. ACT
+    # We use the service just like our Streamlit UI does
+    service.create_suggestion(plz, address, reason)
+
+    # 3. ASSERT - Verify via Repository
+    # Instead of checking a JSON file, we check the In-Memory storage
+    all_suggestions = repo.fetch_raw_data()
+    
+    assert len(all_suggestions) == 1
+    assert all_suggestions[0]['plz'] == "10117"
+    assert all_suggestions[0]['address'] == "Friedrichstraße"
+    assert all_suggestions[0]['status'] == "pending"
+    assert "id" in all_suggestions[0]
+    assert "timestamp" in all_suggestions[0]
+
+def test_review_suggestion_logic(suggestion_setup):
+    # 1. ARRANGE
+    service, repo = suggestion_setup
+    service.create_suggestion("10115", "Mitte", "Need power")
+    suggestion_id = repo.fetch_raw_data()[0]['id']
+
+    # 2. ACT
+    # Test the admin review functionality
+    service.review_suggestion(suggestion_id, status="approved", reviewer="Admin", notes="Valid point")
+
+    # 3. ASSERT
+    updated_suggestion = repo.fetch_raw_data()[0]
+    assert updated_suggestion['status'] == "approved"
+    assert updated_suggestion['reviewed_by'] == "Admin"
+    assert updated_suggestion['review_notes'] == "Valid point"
