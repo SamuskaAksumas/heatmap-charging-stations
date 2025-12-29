@@ -25,26 +25,46 @@
    - Timing and diagnostics via `HelperTools.py`
 
 2. **Source Code (`/src`) — Domain-Driven Architecture**
-The `src` folder is organized into layers to separate data models, business logic, and infrastructure.
 
-* **Domain Entities (`src/domain/entities/`)**
-    * *Defines the data structures and blueprints used across the application.*
-    * **`charging_station.py`**: Model representing charging station attributes.
-    * **`demand_result.py`**: Model for storing calculated demand metrics per PLZ.
-    * **`resident_data.py`**: Model representing population counts and geographic keys.
-    * **`suggestion.py`**: Defines the `ChargingSuggestion` class for user requests.
+The `src` folder is organized into **Bounded Contexts**, each following a layered architecture to separate business logic from technical implementation. This structure ensures that the application is modular, testable, and scalable.
 
-* **Domain Events (`src/domain/events/`)**
-    * *Contains the specific business logic and data workflows triggered by the application.*
-    * **`demand_calculated.py`**: Logic for the "Exact View" demand formula ($Residents / Stations$).
-    * **`load_suggestion.py`**: Utility for loading suggestions from the persistence layer.
-    * **`residents_processed.py`**: Logic for handling raw resident data.
-    * **`stations_processed.py`**: Logic for filtering and grouping charging station registry data.
-    * **`suggestion_handled.py`**: Orchestrates saving suggestions, assigning IDs, and setting default statuses.
 
-* **Infrastructure (`src/infrastructure/`)**
-    * *Handles low-level operations and data access.*
-    * **`readers.py`**: Functions to read CSV/Excel files (e.g., handling metadata headers in the charging registry).
+i. **Shared Bounded Context (`src/shared/`)**
+*The "Foundation": Handles common data ingestion and cleaning logic used by other modules.*
+
+* **Domain Events (`src/shared/domain/events/`)**:
+    * `residents_processed.py`: Logic for cleaning and normalizing raw Berlin resident data (handling T14/T5 formats).
+    * `stations_processed.py`: Logic for filtering, cleaning, and grouping the raw charging station registry.
+* **Infrastructure (`src/shared/infrastructure/repositories/`)**:
+    * `shared_repository.py`: Real implementation for reading CSV/Excel files with automated header detection.
+    * `in_memory_shared_repository.py`: Mock repository for TDD, allowing tests to run without physical file dependencies.
+* **Application (`src/shared/application/services/`)**:
+    * `shared_service.py`: The orchestrator that connects the file readers to the cleaning logic.
+    
+
+ii. **Demand Bounded Context (`src/demand/`)**
+*The "Brain": Calculates where new charging stations are needed most.*
+
+* **Domain Events (`src/demand/domain/events/`)**:
+    * `demand_calculated.py`: The core "Process" function that executes the demand scoring formula.
+* **Infrastructure (`src/demand/infrastructure/repositories/`)**:
+    * `demand_repository.py`: Manages the lifecycle of calculated analysis results during the application session.
+    * `in_memory_demand_repository.py`: Mock storage used to verify demand math in unit tests.
+* **Application (`src/demand/application/services/`)**:
+    * `demand_service.py`: Coordinates between the math logic and the storage layer to provide the UI with processed data.
+* **Presentation (`src/demand/presentation/`)**:
+    * `display_demand.py`: Dedicated layer for rendering the Folium demand heatmap.
+
+iii. **Suggestion Bounded Context (`src/suggestion/`)**
+*The "Interaction": Manages user-submitted location requests and admin workflows.*
+
+* **Domain Entities (`src/suggestion/domain/entities/`)**:
+    * `suggestion.py`: Defines the `ChargingSuggestion` class (schema for ID, PLZ, status, address, and timestamps).
+* **Infrastructure (`src/suggestion/infrastructure/repositories/`)**:
+    * `suggestion_repository.py`: Real-world persistence layer that saves suggestions to a `suggestions.json` file.
+    * `in_memory_suggestion_repository.py`: Fake repository used to test creation and review workflows in isolation.
+* **Application (`src/suggestion/application/services/`)**:
+    * `SuggestionService.py`: Implements business rules for creating new suggestions, assigning IDs, and managing admin reviews.
 
 3. **`config.py`** (Configuration)
    - Defines `pdict` dictionary with key file paths and column names:
