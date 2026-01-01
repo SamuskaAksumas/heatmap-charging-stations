@@ -24,7 +24,49 @@
    - Displays map and data statistics in Streamlit UI
    - Timing and diagnostics via `HelperTools.py`
 
-2. **`config.py`** (Configuration)
+2. **Source Code (`/src`) — Domain-Driven Architecture**
+
+The `src` folder is organized into **Bounded Contexts**, each following a layered architecture to separate business logic from technical implementation. This structure ensures that the application is modular, testable, and scalable.
+
+
+i. **Shared Bounded Context (`src/shared/`)**
+*The "Foundation": Handles common data ingestion and cleaning logic used by other modules.*
+
+* **Domain Events (`src/shared/domain/events/`)**:
+    * `residents_processed.py`: Logic for cleaning and normalizing raw Berlin resident data (handling T14/T5 formats).
+    * `stations_processed.py`: Logic for filtering, cleaning, and grouping the raw charging station registry.
+* **Infrastructure (`src/shared/infrastructure/repositories/`)**:
+    * `shared_repository.py`: Real implementation for reading CSV/Excel files with automated header detection.
+    * `in_memory_shared_repository.py`: Mock repository for TDD, allowing tests to run without physical file dependencies.
+* **Application (`src/shared/application/services/`)**:
+    * `shared_service.py`: The orchestrator that connects the file readers to the cleaning logic.
+    
+
+ii. **Demand Bounded Context (`src/demand/`)**
+*The "Brain": Calculates where new charging stations are needed most.*
+
+* **Domain Events (`src/demand/domain/events/`)**:
+    * `demand_calculated.py`: The core "Process" function that executes the demand scoring formula.
+* **Infrastructure (`src/demand/infrastructure/repositories/`)**:
+    * `demand_repository.py`: Manages the lifecycle of calculated analysis results during the application session.
+    * `in_memory_demand_repository.py`: Mock storage used to verify demand math in unit tests.
+* **Application (`src/demand/application/services/`)**:
+    * `demand_service.py`: Coordinates between the math logic and the storage layer to provide the UI with processed data.
+* **Presentation (`src/demand/presentation/`)**:
+    * `display_demand.py`: Dedicated layer for rendering the Folium demand heatmap.
+
+iii. **Suggestion Bounded Context (`src/suggestion/`)**
+*The "Interaction": Manages user-submitted location requests and admin workflows.*
+
+* **Domain Entities (`src/suggestion/domain/entities/`)**:
+    * `suggestion.py`: Defines the `ChargingSuggestion` class (schema for ID, PLZ, status, address, and timestamps).
+* **Infrastructure (`src/suggestion/infrastructure/repositories/`)**:
+    * `suggestion_repository.py`: Real-world persistence layer that saves suggestions to a `suggestions.json` file.
+    * `in_memory_suggestion_repository.py`: Fake repository used to test creation and review workflows in isolation.
+* **Application (`src/suggestion/application/services/`)**:
+    * `SuggestionService.py`: Implements business rules for creating new suggestions, assigning IDs, and managing admin reviews.
+
+3. **`config.py`** (Configuration)
    - Defines `pdict` dictionary with key file paths and column names:
      - `'geodata_plz_file'`: path to `geodata_berlin_plz.csv`
      - `'charging_stations_file'`: path to `Ladesaeulenregister.csv`
@@ -32,7 +74,7 @@
      - `'bezirke_file'`: path to shapefile for fallback
      - `'geocode_key'`: column name used for grouping (`PLZ`)
 
-3. **`core/methods.py`** (Data Processing & Visualization)
+4. **`core/methods.py`** (Data Processing & Visualization)
    - **`sort_by_plz_add_geometry()`**: Loads PLZ polygons from `geodata_berlin_plz.csv`, parses WKT geometries, computes centroids
    - **`preprop_resid()`**: Reads `plz_einwohner.xlsx` sheet `T14`, detects header rows, aggregates residents by PLZ
    - **`preprop_lstat()`**: Reads `Ladesaeulenregister.csv` with metadata header detection, filters for valid charging stations, assigns to PLZs via geocoding
@@ -42,17 +84,27 @@
      - Builds three interactive folium layers with popups showing PLZ, district, count, and demand ratio
      - Returns folium map object for display in Streamlit
 
-4. **`core/HelperTools.py`** (Utilities)
+5. **`core/HelperTools.py`** (Utilities)
    - `get_current_time()`: Timing and execution logging
    - Simple utilities for consistent formatting
 
-5. **`scripts/compute_demand.py`** (Standalone Demand Computation)
+6. **`scripts/compute_demand.py`** (Standalone Demand Computation)
    - Reads residents from `T14` and charging stations from registry
    - Computes demand metric (residents / stations per PLZ)
    - Generates `tmp_plz_demand.csv` (all PLZs ranked by demand)
    - Generates `tmp_plz_demand_summary.json` (summary statistics: mean, median, 95th percentile, top PLZs)
    - Run independently with: `python scripts/compute_demand.py`
 
+7. **Testing Suite (`/tests`)**
+We use **Pytest** with advanced mocking to ensure code reliability without modifying real data.
+
+* **Demand Logic**: 
+    * *Boundary Testing*: Verifies that 0 stations return the full population as demand.
+    * *Exact View*: Ensures $500 \div 5 = 100.0$.
+* **Suggestion Logic**:
+    * *Mocking*: Uses `unittest.mock` to simulate the file system.
+    * *Isolation*: Patches `load_suggestions` to avoid reading real production data.
+    * *Validation*: Confirms new entries default to `status: pending`.
 ---
 
 ## **Data Format & Column Requirements**
@@ -147,6 +199,20 @@ Or activate the venv then run:
 streamlit run .\main.py --server.port 8503
 ```
 
+**Testing the Application**
+
+We utilize `pytest` to ensure the reliability of our business logic and persistence layers.
+
+**Run All Tests:**
+```
+python3 -m pytest
+```
+
+**Run a Specific Test Suite:** For example, to test only the Demand Logic:
+```
+python3 -m pytest tests/demand/test_demand_logic.py
+```
+
 **Notes**
 - Data quality: Residents are from official Berlin statistics (T14, updated June 2025); charging stations from federal registry (Ladesaeulenregister).
 - Geometry: PLZ polygons are in geographic CRS (EPSG:4326). For precise area-proportional calculations, reproject to a projected CRS (e.g., EPSG:25833).
@@ -155,7 +221,7 @@ streamlit run .\main.py --server.port 8503
 **Contact / Credits**
 
 Team 6:
+- Muhammed Korkot
 - Shoaib Ur Rehman Khan
 - Chirayu Jain
-- Muhammed Korkot
 - Montasir Hasan Chowdhury 

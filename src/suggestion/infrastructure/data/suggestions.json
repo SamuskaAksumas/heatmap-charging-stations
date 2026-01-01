@@ -1,0 +1,137 @@
+[
+  {
+    "plz": "12045",
+    "address": "Korkstraße 12",
+    "reason": "bad",
+    "id": 1,
+    "timestamp": "2025-12-22T15:06:27.791870",
+    "status": "approved",
+    "reviewed_by": "Admin",
+    "review_date": "2025-12-23T16:12:21.459539",
+    "review_notes": ""
+  },
+  {
+    "plz": "12045",
+    "address": "Korkstraße 11",
+    "reason": "badder",
+    "id": 2,
+    "timestamp": "2025-12-22T15:06:45.146856"
+  },
+  {
+    "plz": "12345",
+    "address": "123123",
+    "reason": "12312",
+    "id": 3,
+    "timestamp": "2025-12-22T15:09:13.233471"
+  },
+  {
+    "plz": "10000",
+    "address": "asda",
+    "reason": "adada",
+    "id": 4,
+    "timestamp": "2025-12-22T15:13:10.437428",
+    "status": "rejected",
+    "reviewed_by": "Admin",
+    "review_date": "2025-12-22T15:21:15.525688",
+    "review_notes": ""
+  },
+  {
+    "plz": "12345",
+    "address": "123",
+    "reason": "1231221312",
+    "id": 5,
+    "timestamp": "2025-12-23T16:11:40.663313",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "Suggesting this new station!",
+    "id": 6,
+    "timestamp": "2025-12-24T14:58:53.636342",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "Testing my station",
+    "id": 7,
+    "timestamp": "2025-12-28T14:38:43.374096",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "Testing Another Station for testing infra",
+    "id": 8,
+    "timestamp": "2025-12-28T14:54:48.580933",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "testing for infraaaa",
+    "id": 9,
+    "timestamp": "2025-12-28T17:21:10.093716",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "infraaa 111111",
+    "id": 10,
+    "timestamp": "2025-12-28T22:04:26.335025",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "infraaaa 2222",
+    "id": 11,
+    "timestamp": "2025-12-28T22:05:41.153815",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "infraaa 333",
+    "id": 12,
+    "timestamp": "2025-12-28T22:11:46.705978",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  },
+  {
+    "plz": "10439",
+    "address": "Andersenstraße",
+    "reason": "testing logic",
+    "id": 13,
+    "timestamp": "2025-12-28T22:13:19.114843",
+    "status": "pending",
+    "reviewed_by": null,
+    "review_date": null,
+    "review_notes": null
+  }
+]
