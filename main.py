@@ -6,7 +6,7 @@ from config import pdict
 
 # Import from divided layers
 from src.demand.infrastructure.respositories.demand_repository import DemandRepository
-from src.demand.application.services.demandServices import DemandService
+from src.demand.application.Services.demandServices import DemandService
 from src.shared.application.services.sharedService import SharedService
 from src.shared.infrastructure.repositories.shared_repository import SharedRepository
 
