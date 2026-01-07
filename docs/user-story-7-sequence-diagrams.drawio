@@ -1,0 +1,758 @@
+<mxfile host="app.diagrams.net" modified="2024-01-02T12:00:00.000Z" agent="Claude" version="22.1.0" pages="3">
+
+  <!-- ==================== PAGE 1: CREATE SUGGESTION ==================== -->
+  <diagram name="1. Create Suggestion" id="seq-create">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="900" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title1" value="Sequence Diagram: Create Suggestion" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Participants -->
+        <mxCell id="p1-user" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="60" y="50" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-user-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="75" y="120" as="sourcePoint" />
+            <mxPoint x="75" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p1-ui" value="Streamlit UI&#xa;(src/presentation/)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="160" y="60" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-ui-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="210" y="120" as="sourcePoint" />
+            <mxPoint x="210" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p1-svc" value="SuggestionService&#xa;(Application)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="330" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-svc-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="385" y="120" as="sourcePoint" />
+            <mxPoint x="385" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p1-ent" value="ChargingSuggestion&#xa;(Rich Entity)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="500" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-ent-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="555" y="120" as="sourcePoint" />
+            <mxPoint x="555" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p1-df" value="save_suggestion()&#xa;(Domain Logic)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="670" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-df-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="725" y="120" as="sourcePoint" />
+            <mxPoint x="725" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p1-repo" value="SuggestionRepository&#xa;(Infrastructure)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="840" y="60" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-repo-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="900" y="120" as="sourcePoint" />
+            <mxPoint x="900" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p1-db" value="suggestions.json" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1020" y="55" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="p1-db-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="1060" y="120" as="sourcePoint" />
+            <mxPoint x="1060" y="820" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Step Numbers -->
+        <mxCell id="s1-1" value="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="140" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 1: User opens Tab -->
+        <mxCell id="m1-1" value="Opens Tab &quot;Suggest Location&quot;" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="75" y="150" as="sourcePoint" />
+            <mxPoint x="200" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-2" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="170" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 2: Display form -->
+        <mxCell id="m1-2" value="Displays form (PLZ, Address, Reason)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="200" y="180" as="sourcePoint" />
+            <mxPoint x="75" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-3" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="200" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 3: Fills form -->
+        <mxCell id="m1-3" value="Fills form &amp; clicks Submit" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="75" y="210" as="sourcePoint" />
+            <mxPoint x="200" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Validation Box -->
+        <mxCell id="val-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#c62828;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="165" y="230" width="90" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="val-label" value="Validation" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=9;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="175" y="235" width="70" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1-4" value="4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="250" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Self call: Validation -->
+        <mxCell id="m1-4a" value="Check PLZ 5 digits?" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=8;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="220" y="260" as="sourcePoint" />
+            <mxPoint x="250" y="260" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="250" y="260" />
+              <mxPoint x="250" y="270" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1-4b" value="Check PLZ 10000-14200?" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=8;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="220" y="280" as="sourcePoint" />
+            <mxPoint x="250" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="m1-4c" value="Check fields not empty?" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=8;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="220" y="300" as="sourcePoint" />
+            <mxPoint x="250" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-5" value="5" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="330" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 5: Call service -->
+        <mxCell id="m1-5" value="create_suggestion(plz, address, reason)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="210" y="340" as="sourcePoint" />
+            <mxPoint x="375" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-6" value="6" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="360" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 6: Create entity -->
+        <mxCell id="m1-6" value="new ChargingSuggestion(plz, address, reason)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="385" y="370" as="sourcePoint" />
+            <mxPoint x="545" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-7" value="7" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="390" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 7: Return dict -->
+        <mxCell id="m1-7" value="suggestion_dict" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="545" y="400" as="sourcePoint" />
+            <mxPoint x="385" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-8" value="8" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="420" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 8: Fetch raw data -->
+        <mxCell id="m1-8" value="fetch_raw_data()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="385" y="430" as="sourcePoint" />
+            <mxPoint x="890" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-9" value="9" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="450" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 9: Read JSON -->
+        <mxCell id="m1-9" value="Read JSON file" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="900" y="460" as="sourcePoint" />
+            <mxPoint x="1050" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-10" value="10" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="480" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 10: Return suggestions -->
+        <mxCell id="m1-10" value="current_suggestions[]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="1050" y="490" as="sourcePoint" />
+            <mxPoint x="385" y="490" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-11" value="11" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="510" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 11: Call save_suggestion -->
+        <mxCell id="m1-11" value="save_suggestion(suggestion_dict, count)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="385" y="520" as="sourcePoint" />
+            <mxPoint x="715" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Note for Rich Entity -->
+        <mxCell id="note1" value="Rich Entity:&#xa;- __post_init__ validates&#xa;- Raises InvalidSuggestion&#xa;  Exception if invalid" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=8;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="740" y="530" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="s1-12" value="12" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="600" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 12: Return processed -->
+        <mxCell id="m1-12" value="processed_suggestion" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="715" y="610" as="sourcePoint" />
+            <mxPoint x="385" y="610" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-13" value="13" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="630" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 13: Add to repo -->
+        <mxCell id="m1-13" value="add(processed_suggestion)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="385" y="640" as="sourcePoint" />
+            <mxPoint x="890" y="640" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-14" value="14" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="660" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 14: Write JSON -->
+        <mxCell id="m1-14" value="Append &amp; write JSON" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="900" y="670" as="sourcePoint" />
+            <mxPoint x="1050" y="670" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-15" value="15" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="690" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 15: OK -->
+        <mxCell id="m1-15" value="OK" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="1050" y="700" as="sourcePoint" />
+            <mxPoint x="385" y="700" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-16" value="16" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="720" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 16: Return to UI -->
+        <mxCell id="m1-16" value="suggestion_created" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="375" y="730" as="sourcePoint" />
+            <mxPoint x="210" y="730" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="s1-17" value="17" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="20" y="750" width="20" height="20" as="geometry" />
+        </mxCell>
+
+        <!-- Message 17: Show success -->
+        <mxCell id="m1-17" value="st.success() + st.balloons()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;strokeColor=#2e7d32;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="200" y="760" as="sourcePoint" />
+            <mxPoint x="75" y="760" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ==================== PAGE 2: VIEW SUGGESTIONS ==================== -->
+  <diagram name="2. View Suggestions" id="seq-view">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title2" value="Sequence Diagram: View Suggestions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+          <mxGeometry x="350" y="10" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Participants -->
+        <mxCell id="p2-user" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="80" y="50" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-user-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="95" y="120" as="sourcePoint" />
+            <mxPoint x="95" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p2-ui" value="Streamlit UI&#xa;(src/presentation/)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="60" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-ui-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="250" y="120" as="sourcePoint" />
+            <mxPoint x="250" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p2-svc" value="SuggestionService&#xa;(Application)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-svc-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="455" y="120" as="sourcePoint" />
+            <mxPoint x="455" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p2-df" value="load_suggestions()&#xa;(Domain Logic)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-df-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="635" y="120" as="sourcePoint" />
+            <mxPoint x="635" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p2-repo" value="SuggestionRepository&#xa;(Infrastructure)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="60" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-repo-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="820" y="120" as="sourcePoint" />
+            <mxPoint x="820" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p2-db" value="suggestions.json" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="950" y="55" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="p2-db-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="990" y="120" as="sourcePoint" />
+            <mxPoint x="990" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Messages -->
+        <mxCell id="v1" value="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm1" value="Opens Tab &quot;View Suggestions&quot;" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="95" y="150" as="sourcePoint" />
+            <mxPoint x="240" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v2" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm2" value="get_all_suggestions()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="250" y="180" as="sourcePoint" />
+            <mxPoint x="445" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v3" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm3" value="fetch_raw_data()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="455" y="210" as="sourcePoint" />
+            <mxPoint x="810" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v4" value="4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="230" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm4" value="Read JSON file" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="820" y="240" as="sourcePoint" />
+            <mxPoint x="980" y="240" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v5" value="5" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="260" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm5" value="raw_suggestions[]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="980" y="270" as="sourcePoint" />
+            <mxPoint x="455" y="270" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v6" value="6" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="290" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm6" value="load_suggestions(raw_data)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="455" y="300" as="sourcePoint" />
+            <mxPoint x="625" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Note for load_suggestions -->
+        <mxCell id="note2" value="Filters:&#xa;status != 'deleted'" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="650" y="310" width="100" height="40" as="geometry" />
+        </mxCell>
+
+        <mxCell id="v7" value="7" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm7" value="filtered_suggestions[]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="625" y="370" as="sourcePoint" />
+            <mxPoint x="455" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v8" value="8" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="390" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm8" value="suggestions[]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="445" y="400" as="sourcePoint" />
+            <mxPoint x="250" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="v9" value="9" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm9" value="Group by PLZ" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="260" y="430" as="sourcePoint" />
+            <mxPoint x="290" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Loop box -->
+        <mxCell id="loop-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="130" y="460" width="180" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="loop-label" value="loop [for each suggestion]" style="text;html=1;strokeColor=none;fillColor=#e0e0e0;align=left;verticalAlign=middle;fontSize=9;fontStyle=1;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="130" y="460" width="140" height="18" as="geometry" />
+        </mxCell>
+
+        <mxCell id="v10" value="10" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="500" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="vm10" value="Display: status, address,&#xa;reason, timestamp" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=8;strokeColor=#2e7d32;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="240" y="520" as="sourcePoint" />
+            <mxPoint x="95" y="520" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+  <!-- ==================== PAGE 3: ADMIN REVIEW ==================== -->
+  <diagram name="3. Admin Review" id="seq-review">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="800" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title3" value="Sequence Diagram: Admin Review" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+          <mxGeometry x="350" y="10" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Participants -->
+        <mxCell id="p3-admin" value="Admin" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#fff3e0;strokeColor=#e65100;" vertex="1" parent="1">
+          <mxGeometry x="80" y="50" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-admin-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="95" y="120" as="sourcePoint" />
+            <mxPoint x="95" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p3-ui" value="Streamlit UI&#xa;(src/presentation/)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="200" y="60" width="100" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-ui-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="250" y="120" as="sourcePoint" />
+            <mxPoint x="250" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p3-svc" value="SuggestionService&#xa;(Application)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="400" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-svc-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="455" y="120" as="sourcePoint" />
+            <mxPoint x="455" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p3-df" value="Entity.approve()&#xa;Entity.reject()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="580" y="60" width="110" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-df-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="635" y="120" as="sourcePoint" />
+            <mxPoint x="635" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p3-repo" value="SuggestionRepository&#xa;(Infrastructure)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="760" y="60" width="120" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-repo-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="820" y="120" as="sourcePoint" />
+            <mxPoint x="820" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="p3-db" value="suggestions.json" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="950" y="55" width="80" height="55" as="geometry" />
+        </mxCell>
+        <mxCell id="p3-db-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="990" y="120" as="sourcePoint" />
+            <mxPoint x="990" y="720" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Messages -->
+        <mxCell id="r1" value="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="140" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm1" value="Enters password &quot;advanced&quot;" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="95" y="150" as="sourcePoint" />
+            <mxPoint x="240" y="150" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r2" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="170" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm2" value="Validate password" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="260" y="180" as="sourcePoint" />
+            <mxPoint x="290" y="180" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r3" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="200" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm3" value="Show Admin buttons (Approve/Reject)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;strokeColor=#2e7d32;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="240" y="210" as="sourcePoint" />
+            <mxPoint x="95" y="210" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r4" value="4" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="240" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm4" value="Clicks &quot;Approve&quot; for Suggestion #5" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="95" y="250" as="sourcePoint" />
+            <mxPoint x="240" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r5" value="5" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="270" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm5" value="review_suggestion(id=5, status=&quot;approved&quot;, reviewer=&quot;Admin&quot;)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="250" y="280" as="sourcePoint" />
+            <mxPoint x="445" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r6" value="6" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="300" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm6" value="fetch_raw_data()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="455" y="310" as="sourcePoint" />
+            <mxPoint x="810" y="310" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r7" value="7" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="330" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm7" value="Read JSON file" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="820" y="340" as="sourcePoint" />
+            <mxPoint x="980" y="340" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r8" value="8" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="360" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm8" value="all_suggestions[]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="980" y="370" as="sourcePoint" />
+            <mxPoint x="455" y="370" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r9" value="9" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="390" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm9" value="Find suggestion with id=5" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="465" y="400" as="sourcePoint" />
+            <mxPoint x="495" y="400" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r10" value="10" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="420" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm10" value="suggestion.approve(&quot;Admin&quot;, &quot;&quot;)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="455" y="430" as="sourcePoint" />
+            <mxPoint x="625" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Note for Entity approve() -->
+        <mxCell id="note3" value="Rich Entity method:&#xa;approve(reviewer, notes)&#xa;- Validates transition&#xa;- Sets all review fields" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=8;align=left;spacingLeft=5;" vertex="1" parent="1">
+          <mxGeometry x="650" y="440" width="120" height="70" as="geometry" />
+        </mxCell>
+
+        <mxCell id="r11" value="11" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm11" value="updated_suggestion" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="625" y="530" as="sourcePoint" />
+            <mxPoint x="455" y="530" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r12" value="12" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="550" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm12" value="save(all_suggestions)" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="455" y="560" as="sourcePoint" />
+            <mxPoint x="810" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r13" value="13" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="580" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm13" value="Overwrite JSON file" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="820" y="590" as="sourcePoint" />
+            <mxPoint x="980" y="590" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r14" value="14" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="610" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm14" value="OK" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="980" y="620" as="sourcePoint" />
+            <mxPoint x="250" y="620" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r15" value="15" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm15" value="st.rerun()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="260" y="650" as="sourcePoint" />
+            <mxPoint x="290" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="r16" value="16" style="ellipse;whiteSpace=wrap;html=1;fillColor=#7b1fa2;strokeColor=#7b1fa2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="670" width="20" height="20" as="geometry" />
+        </mxCell>
+        <mxCell id="rm16" value="Show updated list" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;dashed=1;fontSize=9;strokeColor=#2e7d32;" edge="1" parent="1">
+          <mxGeometry width="80" relative="1" as="geometry">
+            <mxPoint x="240" y="680" as="sourcePoint" />
+            <mxPoint x="95" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+
+</mxfile>

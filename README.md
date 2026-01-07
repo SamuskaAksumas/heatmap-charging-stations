@@ -1,227 +1,252 @@
+# Berlin Geo Heatmap
+
 **Project Introduction**
 - **Name**: Berlin Geo Heatmap (Project 1)
 - **Purpose**: Visualize the heatmap for the amount of electric charging stations and residents. With this information a 3rd heatmap is being generated to show the demand defined by residents/charging station.
 
-**Directory Organization:**
-- **Main app**: `main.py` — Streamlit app orchestrator that loads datasets, preprocesses them, and builds the interactive map.
-- **Configuration**: `config.py` — small dictionary `pdict` with filenames and the geocode key (`PLZ`).
-- **Core code**: `berlingeoheatmap_project1\core\methods.py` — preprocessing and map-building functions.
-- **Helpers**: `berlingeoheatmap_project1\core\HelperTools.py` — timing and small utilities.
-- **Scripts**: `scripts\compute_demand.py` — standalone script to compute demand metrics and generate summary reports.
-- **Datasets folder**: `berlingeoheatmap_project1\datasets`
-  - PLZ polygons: `geodata_berlin_plz.csv` (WKT geometry)
-  - Charging stations registry: `Ladesaeulenregister.csv` (original registry with metadata header lines)
-  - Residents: `plz_einwohner.xlsx` (sheet `T14` is preferred for per-PLZ counts, this has been added manually because there was no csv for this given. Also this dataset is more up to date) https://www.statistik-berlin-brandenburg.de/a-i-5-hj
-  - Bezirke shapefiles: `datasets\berlin_bezirke\bezirksgrenzen.shp` (used for T5 fallback mapping, contains residents per district)
-
-**What Each Module Does:**
-
-1. **`main.py`** (Streamlit Orchestrator)
-   - Loads all datasets using functions from `core.methods`
-   - Preprocesses residents, charging stations, and geometry data
-   - Detects which visualization layer user selects (Residents / Charging_Stations / Demand) via Streamlit radio button
-   - Calls `make_streamlit_electric_Charging_resid()` to generate the interactive folium map
-   - Displays map and data statistics in Streamlit UI
-   - Timing and diagnostics via `HelperTools.py`
-
-2. **Source Code (`/src`) — Domain-Driven Architecture**
-
-The `src` folder is organized into **Bounded Contexts**, each following a layered architecture to separate business logic from technical implementation. This structure ensures that the application is modular, testable, and scalable.
-
-
-i. **Shared Bounded Context (`src/shared/`)**
-*The "Foundation": Handles common data ingestion and cleaning logic used by other modules.*
-
-* **Domain Events (`src/shared/domain/events/`)**:
-    * `residents_processed.py`: Logic for cleaning and normalizing raw Berlin resident data (handling T14/T5 formats).
-    * `stations_processed.py`: Logic for filtering, cleaning, and grouping the raw charging station registry.
-* **Infrastructure (`src/shared/infrastructure/repositories/`)**:
-    * `shared_repository.py`: Real implementation for reading CSV/Excel files with automated header detection.
-    * `in_memory_shared_repository.py`: Mock repository for TDD, allowing tests to run without physical file dependencies.
-* **Application (`src/shared/application/services/`)**:
-    * `shared_service.py`: The orchestrator that connects the file readers to the cleaning logic.
-    
-
-ii. **Demand Bounded Context (`src/demand/`)**
-*The "Brain": Calculates where new charging stations are needed most.*
-
-* **Domain Events (`src/demand/domain/events/`)**:
-    * `demand_calculated.py`: The core "Process" function that executes the demand scoring formula.
-* **Infrastructure (`src/demand/infrastructure/repositories/`)**:
-    * `demand_repository.py`: Manages the lifecycle of calculated analysis results during the application session.
-    * `in_memory_demand_repository.py`: Mock storage used to verify demand math in unit tests.
-* **Application (`src/demand/application/services/`)**:
-    * `demand_service.py`: Coordinates between the math logic and the storage layer to provide the UI with processed data.
-* **Presentation (`src/demand/presentation/`)**:
-    * `display_demand.py`: Dedicated layer for rendering the Folium demand heatmap.
-
-iii. **Suggestion Bounded Context (`src/suggestion/`)**
-*The "Interaction": Manages user-submitted location requests and admin workflows.*
-
-* **Domain Entities (`src/suggestion/domain/entities/`)**:
-    * `suggestion.py`: Defines the `ChargingSuggestion` class (schema for ID, PLZ, status, address, and timestamps).
-* **Infrastructure (`src/suggestion/infrastructure/repositories/`)**:
-    * `suggestion_repository.py`: Real-world persistence layer that saves suggestions to a `suggestions.json` file.
-    * `in_memory_suggestion_repository.py`: Fake repository used to test creation and review workflows in isolation.
-* **Application (`src/suggestion/application/services/`)**:
-    * `SuggestionService.py`: Implements business rules for creating new suggestions, assigning IDs, and managing admin reviews.
-
-3. **`config.py`** (Configuration)
-   - Defines `pdict` dictionary with key file paths and column names:
-     - `'geodata_plz_file'`: path to `geodata_berlin_plz.csv`
-     - `'charging_stations_file'`: path to `Ladesaeulenregister.csv`
-     - `'residents_file'`: path to `plz_einwohner.xlsx`
-     - `'bezirke_file'`: path to shapefile for fallback
-     - `'geocode_key'`: column name used for grouping (`PLZ`)
-
-4. **`core/methods.py`** (Data Processing & Visualization)
-   - **`sort_by_plz_add_geometry()`**: Loads PLZ polygons from `geodata_berlin_plz.csv`, parses WKT geometries, computes centroids
-   - **`preprop_resid()`**: Reads `plz_einwohner.xlsx` sheet `T14`, detects header rows, aggregates residents by PLZ
-   - **`preprop_lstat()`**: Reads `Ladesaeulenregister.csv` with metadata header detection, filters for valid charging stations, assigns to PLZs via geocoding
-   - **`make_streamlit_electric_Charging_resid()`**: Main visualization function that:
-     - Merges residents, charging stations, and demand data into full PLZ geometry set
-     - Creates color scales (linear for Residents/Charging_Stations, 95th-percentile capped for Demand)
-     - Builds three interactive folium layers with popups showing PLZ, district, count, and demand ratio
-     - Returns folium map object for display in Streamlit
-
-5. **`core/HelperTools.py`** (Utilities)
-   - `get_current_time()`: Timing and execution logging
-   - Simple utilities for consistent formatting
-
-6. **`scripts/compute_demand.py`** (Standalone Demand Computation)
-   - Reads residents from `T14` and charging stations from registry
-   - Computes demand metric (residents / stations per PLZ)
-   - Generates `tmp_plz_demand.csv` (all PLZs ranked by demand)
-   - Generates `tmp_plz_demand_summary.json` (summary statistics: mean, median, 95th percentile, top PLZs)
-   - Run independently with: `python scripts/compute_demand.py`
-
-7. **Testing Suite (`/tests`)**
-We use **Pytest** with advanced mocking to ensure code reliability without modifying real data.
-
-* **Demand Logic**: 
-    * *Boundary Testing*: Verifies that 0 stations return the full population as demand.
-    * *Exact View*: Ensures $500 \div 5 = 100.0$.
-* **Suggestion Logic**:
-    * *Mocking*: Uses `unittest.mock` to simulate the file system.
-    * *Isolation*: Patches `load_suggestions` to avoid reading real production data.
-    * *Validation*: Confirms new entries default to `status: pending`.
 ---
 
-## **Data Format & Column Requirements**
+## Architecture Overview (DDD)
 
-### **1. Residents Data (`plz_einwohner.xlsx` — Sheet `T14`)**
+This project follows **Domain-Driven Design (DDD)** principles with a layered architecture:
 
-| Column Name | Format | Value Range | Plausible Values | Notes |
-|------------|--------|-------------|-----------------|-------|
-| `Postleitzahl` | Integer or String | 10001–14199 | 10247, 12309, 13187, etc. | 5-digit Berlin postal codes; used as join key with PLZ geometries |
-| `Insgesamt` | Integer (whole numbers) | 0–200,000+ | 28,386 (PLZ 12309), 41,630 (PLZ 10247) | Total residents in that PLZ within that district; summed across all rows = 3,902,645 |
-| `Bezirk` (optional) | String | District names | Mitte, Charlottenburg-Wilmersdorf, etc. | Helps identify which district residents belong to; kept for context |
-
-**Data Quality Notes for T14:**
-- **Structure**: 237 rows total, 190 unique PLZs (some PLZs appear in multiple rows/districts)
-- **Distribution**: Highly skewed; central districts (Mitte, Friedrichshain-Kreuzberg) have higher concentrations
-- **Aggregation**: Each row represents a unique (PLZ, district) combination; summing all `Insgesamt` values = 3,902,645 (verified correct)
-- **Fallback (T5)**: If `T14` sheet is missing, code falls back to `T5` (Bezirke/district-level data) and distributes residents to PLZs proportionally by area
-
-### **2. Charging Stations Registry (`Ladesaeulenregister.csv`)**
-
-| Column Name | Format | Value Range | Plausible Values | Notes |
-|------------|--------|-------------|-----------------|-------|
-| `Postleitzahl` | String or Integer | 10001–14199 | 10247, 12309, 13187, etc. | 5-digit Berlin postal code; primary join key with PLZ geometries and residents |
-| `Longitude` | Float | 13.08–13.76 | 13.4050, 13.2195, etc. | Geographic coordinates (EPSG:4326, WGS84); used for fallback geocoding if PLZ missing |
-| `Latitude` | Float | 52.34–52.67 | 52.5200, 52.4500, etc. | Geographic coordinates (EPSG:4326, WGS84); used for fallback geocoding if PLZ missing |
-| `Betreiber` | String | Text (company names) | Vattenfall, Shell, Aral, etc. | Operator/company name; kept for metadata, not used in heatmap computation |
-| Other columns (optional) | String/Integer | Various | `Inbetriebnahme`, `Ladetyp`, etc. | Additional metadata (date, charging type, etc.); ignored in computation |
-
-**Data Quality Notes for Ladesaeulenregister:**
-- **File structure**: Contains 3–4 metadata/header rows at top (automatically detected and skipped by `preprop_lstat()`)
-- **Total stations**: 3,657 valid rows counted in Berlin datasets
-- **Distribution**: Highly concentrated in central districts (Mitte, Charlottenburg-Wilmersdorf); sparse in outer districts (Treptow-Köpenick, Spandau)
-- **Fallback geocoding**: If `Postleitzahl` missing, code reverse-geocodes using `Latitude`/`Longitude` to find nearest PLZ via centroid-distance matching
-- **Duplicates**: Some charging stations listed multiple times (e.g., different connectors, different operators); current logic counts them individually per row
-
-### **3. PLZ Geometries (`geodata_berlin_plz.csv`)**
-
-| Column Name | Format | Value Range | Plausible Values | Notes |
-|------------|--------|-------------|-----------------|-------|
-| `plz` | Integer or String | 10001–14199 | 10247, 12309, 13187, etc. | 5-digit postal code; primary join key for merging with residents & stations |
-| `geometry` | WKT String | POLYGON or MULTIPOLYGON | `POLYGON((13.08 52.34, 13.09 52.34, ...))` | Well-Known Text format; parsed into shapely Polygon/MultiPolygon objects by geopandas |
-
-**Data Quality Notes for geodata_berlin_plz.csv:**
-- **CRS**: Geographic (EPSG:4326, WGS84) — uses lat/lon coordinates
-- **Completeness**: Contains all 190 unique Berlin PLZs; ensures every PLZ boundary is visually displayed
-- **Geometry validity**: All WKT strings are valid polygons (no self-intersections, no empty/null geometries)
-- **Centroid computation**: Code automatically computes polygon centroids for label placement and reference
-
-### **Expected Distributions & Value Ranges:**
-
-- **Residents per PLZ**: Range 5–200,000+; most common 10,000–50,000; mean ~20,500; total sum 3,902,645
-- **Charging stations per PLZ**: Range 0–60+; most common 0–5 stations; mean ~4–5 (3,657 total / ~190 unique PLZs); distribution is highly left-skewed with outliers
-- **Demand (residents / stations)**: Range 0–28,386 (when stations = 1); median ~3,000–5,000; 95th percentile ~10,000 (color scale cap to avoid outlier saturation)
-- **Latitude/Longitude**: Latitude 52.34–52.67 (north-south extent of Berlin); Longitude 13.08–13.76 (east-west extent); all in EPSG:4326
-
----
-
-**How It Works (High Level)**
-- **Load geodata**: PLZ polygons from `geodata_berlin_plz.csv` are loaded and used to draw PLZ areas and compute centroids.
-- **Load charging stations**: `Ladesaeulenregister.csv` is read with header-detection (file contains metadata rows). Charging station rows are preprocessed and assigned to PLZs.
-- **Load residents**: Prefer the Excel sheet `T14` (columns `Postleitzahl` and `Insgesamt`) for exact residents per (PLZ, district) combination. Each row represents residents in that postal code within that district. If `T14` is missing, the code falls back to `T5` (Bezirke) and distributes district residents to PLZs.
-- **Merge & visualize**: The app builds three interactive layers — **Residents**, **Charging_Stations**, and **Demand** — with color scales. Charging station counts are merged into the full PLZ geometry set so PLZs with zero stations are still displayed (legend includes 0). Demand shows residents per charging station per PLZ (color-scaled to 95th percentile to avoid outlier saturation).
-
-**Interpretation of Results**
-- **Residents layer**: Shows population density by (PLZ, district) combination. Each row in T14 represents a unique postal code within a district.
-- **Charging Stations layer**: Shows the count of electric vehicle charging stations per PLZ. PLZs with zero stations are displayed in yellow to highlight gaps in infrastructure.
-- **Demand layer**: Computed metric = residents / charging stations per PLZ. Color scale is capped at the 95th percentile to avoid outlier saturation and make patterns visible. High demand (red) indicates areas with many residents but few charging stations — priorities for infrastructure expansion.
-- **Data integrity**: The residents total from `T14` is **3,902,645** (verified correct). Each (PLZ, district) entry is counted separately; do NOT aggregate by PLZ alone.
-
-Summary totals computed:
-- **Total residents (sum of all T14 rows)**: 3,902,645
-- **Total charging stations counted**: 3,657
-
-Top PLZs by residents per station (high demand, highest ratio first):
-- PLZ `12309` — Residents: 28,386 — Stations: 1 — Demand (res/station): 28,386
-- PLZ `10247` — Residents: 41,630 — Stations: 2 — Demand: 20,815
-- PLZ `13187` — Residents: 38,144 — Stations: 2 — Demand: 19,072
-- PLZ `12627` — Residents: 45,930 — Stations: 3 — Demand: 15,310
-
-Note: PLZs with zero charging stations (e.g., parts of districts with very small resident populations in certain PLZ ranges) also show high demand but are not always the largest population centers.
-
-Full detailed demand rankings saved to `tmp_plz_demand.csv` (regenerate by running `scripts/compute_demand.py`).
-
-**How to run the app (recommended, from project root)**
-PowerShell (no activation required if you call python in .venv explicitly):
 ```
++------------------+
+|   Presentation   |  <- Streamlit UI, Map Components
++------------------+
+        |
+        v
++------------------+
+|   Application    |  <- Services (thin orchestrators)
++------------------+
+        |
+        v
++------------------+
+|     Domain       |  <- Entities, Value Objects, Events, Repository Interfaces
++------------------+
+        ^
+        |
++------------------+
+|  Infrastructure  |  <- Repositories, Preprocessing, Utils
++------------------+
+```
+
+For detailed architecture diagrams, see `docs/`.
+
+---
+
+## Directory Organization
+
+```
+.
+├── main.py                              # Composition Root (Entry Point)
+├── config.py                            # Configuration (pdict)
+├── README.md                            # This file
+│
+├── docs/                                # Architecture Documentation
+│   ├── architecture/                    # DDD layer diagrams (draw.io)
+│   └── domain/                          # Domain context diagrams
+│
+├── src/
+│   ├── presentation/                    # UI Layer
+│   │   ├── streamlit_app.py             # Main Streamlit app function
+│   │   ├── components/                  # UI components (map, forms, lists)
+│   │   └── utils/                       # Color maps, UI helpers
+│   │
+│   ├── shared/                          # Shared Bounded Context
+│   │   ├── domain/
+│   │   │   ├── value_objects/           # PostalCode
+│   │   │   ├── events/                  # DomainEvent base class
+│   │   │   ├── exceptions/              # DomainException, InvalidPostalCodeException
+│   │   │   └── repositories/            # BaseRepository interface
+│   │   ├── application/services/        # shared_service.py
+│   │   └── infrastructure/
+│   │       ├── preprocessing/           # stations.py, residents.py, geo_utils.py
+│   │       ├── repositories/            # shared_repository.py
+│   │       └── utils/                   # helper_tools.py (timer)
+│   │
+│   ├── demand/                          # Demand Bounded Context
+│   │   ├── domain/
+│   │   │   ├── entities/                # DemandResult (rich domain model)
+│   │   │   ├── value_objects/           # DemandScore
+│   │   │   ├── events/                  # DemandCalculatedEvent
+│   │   │   ├── exceptions/              # InvalidDemandDataException
+│   │   │   └── repositories/            # DemandRepositoryInterface
+│   │   ├── application/services/        # demand_service.py
+│   │   └── infrastructure/repositories/ # demand_repository.py, in_memory_...
+│   │
+│   └── suggestion/                      # Suggestion Bounded Context
+│       ├── domain/
+│       │   ├── entities/                # ChargingSuggestion (rich domain model)
+│       │   ├── events/                  # SuggestionCreatedEvent, SuggestionReviewedEvent
+│       │   ├── exceptions/              # InvalidSuggestionException
+│       │   └── repositories/            # SuggestionRepositoryInterface
+│       ├── application/services/        # suggestion_service.py
+│       └── infrastructure/repositories/ # suggestion_repository.py, in_memory_...
+│
+├── tests/                               # Test Suite
+│   ├── shared/                          # PostalCode tests
+│   ├── demand/                          # Demand logic tests
+│   ├── suggestions/                     # Suggestion persistence tests
+│   ├── fakes/                           # Test doubles
+│   └── test_smoke.py                    # Smoke tests for app verification
+│
+└── scripts/                             # Standalone scripts
+    └── compute_demand.py                # Demand computation script
+```
+
+---
+
+## What Each Module Does
+
+### 1. `main.py` (Composition Root)
+- Entry point for the Streamlit application
+- Loads datasets using infrastructure repositories
+- Calls preprocessing functions from `src/shared/infrastructure/preprocessing/`
+- Invokes `make_streamlit_electric_charging_resid()` from presentation layer
+
+### 2. Presentation Layer (`src/presentation/`)
+- `streamlit_app.py`: Main UI function with tabs for Map, Suggestions, Reviews
+- `components/map_view.py`: Renders Residents, Stations, Demand layers
+- `components/suggestion_form.py`: User suggestion submission form
+- `components/suggestion_list.py`: Admin review interface
+
+### 3. Bounded Contexts
+
+#### i. Shared Context (`src/shared/`)
+*Foundation: Common components used across all contexts*
+
+- **Value Objects**: `PostalCode` - Berlin PLZ validation (10000-14200)
+- **Domain Events**: `DomainEvent` - Base class with event_id, timestamp
+- **Exceptions**: `DomainException`, `InvalidPostalCodeException`
+- **Repository Interface**: `BaseRepository` - Generic CRUD interface
+- **Preprocessing**: `preprop_lstat()`, `preprop_resid()`, `sort_by_plz_add_geometry()`
+- **Utils**: `timer` decorator for performance logging
+
+#### ii. Demand Context (`src/demand/`)
+*Brain: Calculates where new charging stations are needed*
+
+- **Entity**: `DemandResult` - Rich domain model with:
+  - `get_demand_category()` - Returns 'critical', 'high', 'medium', 'low', 'satisfied'
+  - `is_high_demand()`, `is_medium_demand()` - Categorization methods
+  - `get_priority_rank()` - Priority for infrastructure planning
+- **Value Object**: `DemandScore` - Validates non-negative demand values
+- **Domain Event**: `DemandCalculatedEvent` - Captures calculation results
+- **Service**: `DemandService` - Thin orchestrator for calculation workflow
+
+#### iii. Suggestion Context (`src/suggestion/`)
+*Interaction: Manages user suggestions for new charging locations*
+
+- **Entity**: `ChargingSuggestion` - Rich domain model with:
+  - Status transitions: pending -> approved/rejected -> deleted
+  - `approve()`, `reject()`, `delete()` - Business methods
+  - `can_transition_to()` - Status validation
+- **Domain Events**: `SuggestionCreatedEvent`, `SuggestionReviewedEvent`
+- **Service**: `SuggestionService` - Thin orchestrator for CRUD operations
+
+### 4. Testing (`tests/`)
+- **TDD approach**: Red-Green-Refactor cycle
+- **50 tests** covering:
+  - Unit tests with `@pytest.mark.parametrize` for edge cases
+  - Smoke tests for app-level verification
+  - In-memory repositories for isolation
+
+---
+
+## Data Format & Column Requirements
+
+### 1. Residents Data (`plz_einwohner.xlsx` - Sheet `T14`)
+
+| Column Name | Format | Value Range | Notes |
+|------------|--------|-------------|-------|
+| `Postleitzahl` | Integer/String | 10001-14199 | Berlin postal codes |
+| `Insgesamt` | Integer | 0-200,000+ | Total residents per PLZ |
+| `Bezirk` (optional) | String | District names | Context information |
+
+**Data Quality Notes:**
+- 237 rows total, 190 unique PLZs
+- Total sum: 3,902,645 residents
+- Fallback to `T5` sheet if `T14` missing
+
+### 2. Charging Stations (`Ladesaeulenregister.csv`)
+
+| Column Name | Format | Value Range | Notes |
+|------------|--------|-------------|-------|
+| `Postleitzahl` | String/Integer | 10001-14199 | Join key |
+| `Longitude` | Float | 13.08-13.76 | EPSG:4326 |
+| `Latitude` | Float | 52.34-52.67 | EPSG:4326 |
+
+**Data Quality Notes:**
+- 3,657 valid stations in Berlin
+- 3-4 metadata header rows (auto-detected)
+
+### 3. PLZ Geometries (`geodata_berlin_plz.csv`)
+
+| Column Name | Format | Notes |
+|------------|--------|-------|
+| `plz` | Integer/String | Join key |
+| `geometry` | WKT String | POLYGON/MULTIPOLYGON |
+
+### Expected Distributions
+
+- **Residents per PLZ**: 5-200,000+; mean ~20,500
+- **Stations per PLZ**: 0-60+; mean ~4-5
+- **Demand (residents/stations)**: 0-28,386
+
+---
+
+## How to Run
+
+**Start the Streamlit App:**
+```bash
+# With venv
 .\.venv\Scripts\python.exe -m streamlit run .\main.py --server.port 8503
-```
-Or activate the venv then run:
-```
-.\.venv\Scripts\Activate.ps1
-streamlit run .\main.py --server.port 8503
+
+# Or after activating venv
+streamlit run main.py --server.port 8503
 ```
 
-**Testing the Application**
+**Run Tests:**
+```bash
+# All tests
+python -m pytest
 
-We utilize `pytest` to ensure the reliability of our business logic and persistence layers.
+# Specific test suite
+python -m pytest tests/demand/test_demand_logic.py
 
-**Run All Tests:**
-```
-python3 -m pytest
-```
-
-**Run a Specific Test Suite:** For example, to test only the Demand Logic:
-```
-python3 -m pytest tests/demand/test_demand_logic.py
+# Verbose output
+python -m pytest -v
 ```
 
-**Notes**
-- Data quality: Residents are from official Berlin statistics (T14, updated June 2025); charging stations from federal registry (Ladesaeulenregister).
-- Geometry: PLZ polygons are in geographic CRS (EPSG:4326). For precise area-proportional calculations, reproject to a projected CRS (e.g., EPSG:25833).
-- Warning suppression: Some pandas/geopandas warnings (SettingWithCopyWarning, CRS warnings) can be cleaned by specifying dtypes and using `.loc` assignments. See code comments for details.
+---
 
-**Contact / Credits**
+## Interpretation of Results
 
-Team 6:
+- **Residents layer**: Population density by PLZ
+- **Charging Stations layer**: Station count per PLZ (yellow = 0 stations)
+- **Demand layer**: Residents/stations ratio (red = high demand, priority for expansion)
+
+**Top demand areas:**
+| PLZ | Residents | Stations | Demand |
+|-----|-----------|----------|--------|
+| 12309 | 28,386 | 1 | 28,386 |
+| 10247 | 41,630 | 2 | 20,815 |
+| 13187 | 38,144 | 2 | 19,072 |
+
+---
+
+## Notes
+
+- Data sources: Berlin statistics (T14, June 2025), Federal charging station registry
+- Geometry: EPSG:4326 (WGS84)
+- For area-proportional calculations, reproject to EPSG:25833
+
+---
+
+## Contact / Credits
+
+**Team 6:**
 - Muhammed Korkot
 - Shoaib Ur Rehman Khan
 - Chirayu Jain
-- Montasir Hasan Chowdhury 
+- Montasir Hasan Chowdhury
