@@ -1,25 +1,25 @@
 """
-Smoke Test - App-Verifikation
+Smoke Test - Application Verification
 
-Prüft ob alle wichtigen Module importiert werden können
-und die Anwendung grundsätzlich lauffähig ist.
+Verifies that all important modules can be imported
+and that the application is basically runnable.
 
-Per TDD-Vorgabe aus der Vorlesung: Smoke Tests stellen sicher,
-dass nach Refactoring die App-Level Funktionalität erhalten bleibt.
+Following TDD guidelines: Smoke tests ensure that after refactoring,
+the app-level functionality is preserved.
 """
 import pytest
 
 
 class TestSmokeImports:
-    """Prüft ob alle Module importiert werden können."""
+    """Verifies that all modules can be imported."""
 
     def test_main_module_imports(self) -> None:
-        """Prüft ob main.py und config importiert werden können."""
+        """Verifies that main.py and config can be imported."""
         from config import pdict
         assert 'geocode' in pdict
 
     def test_presentation_layer_imports(self) -> None:
-        """Prüft ob der Presentation Layer importiert werden kann."""
+        """Verifies that the presentation layer can be imported."""
         from src.presentation.streamlit_app import make_streamlit_electric_charging_resid
         from src.presentation.components.map_view import render_map_layer
         from src.presentation.components.suggestion_form import render_suggestion_form
@@ -28,18 +28,18 @@ class TestSmokeImports:
         assert callable(render_map_layer)
 
     def test_demand_layer_imports(self) -> None:
-        """Prüft ob der Demand Bounded Context importiert werden kann."""
+        """Verifies that the demand bounded context can be imported."""
         from src.demand.application.services.demand_service import DemandService
         from src.demand.domain.entities.demand_result import DemandResult
         from src.demand.domain.events.demand_calculated import on_demand_calculated
         from src.demand.domain.exceptions import InvalidDemandDataException
         from src.demand.domain.value_objects.demand_score import DemandScore
-        from src.demand.infrastructure.respositories.demand_repository import DemandRepository
+        from src.demand.infrastructure.repositories.demand_repository import DemandRepository
         assert DemandService is not None
         assert DemandResult is not None
 
     def test_suggestion_layer_imports(self) -> None:
-        """Prüft ob der Suggestion Bounded Context importiert werden kann."""
+        """Verifies that the suggestion bounded context can be imported."""
         from src.suggestion.application.services.suggestion_service import SuggestionService
         from src.suggestion.domain.entities.suggestion import ChargingSuggestion
         from src.suggestion.domain.exceptions import InvalidSuggestionException
@@ -49,7 +49,7 @@ class TestSmokeImports:
         assert ChargingSuggestion is not None
 
     def test_shared_layer_imports(self) -> None:
-        """Prüft ob der Shared Bounded Context importiert werden kann."""
+        """Verifies that the shared bounded context can be imported."""
         from src.shared.domain.value_objects.postal_code import PostalCode
         from src.shared.domain.events.domain_event import DomainEvent
         from src.shared.domain.exceptions import DomainException, InvalidPostalCodeException
@@ -60,7 +60,7 @@ class TestSmokeImports:
         assert DomainEvent is not None
 
     def test_infrastructure_preprocessing_imports(self) -> None:
-        """Prüft ob die Preprocessing-Module importiert werden können."""
+        """Verifies that preprocessing modules can be imported."""
         from src.shared.infrastructure.preprocessing.geo_utils import (
             sort_by_plz_add_geometry,
             get_plz_centroid,
@@ -75,29 +75,29 @@ class TestSmokeImports:
 
 
 class TestSmokeInstantiation:
-    """Prüft ob wichtige Klassen instanziiert werden können."""
+    """Verifies that important classes can be instantiated."""
 
     def test_postal_code_creation(self) -> None:
-        """Prüft ob ein PostalCode Value Object erstellt werden kann."""
+        """Verifies that a PostalCode value object can be created."""
         from src.shared.domain.value_objects.postal_code import PostalCode
         plz = PostalCode("10115")
         assert plz.value == "10115"
 
     def test_demand_score_creation(self) -> None:
-        """Prüft ob ein DemandScore Value Object erstellt werden kann."""
+        """Verifies that a DemandScore value object can be created."""
         from src.demand.domain.value_objects.demand_score import DemandScore
         score = DemandScore(500.0)
         assert score.value == 500.0
 
     def test_domain_event_creation(self) -> None:
-        """Prüft ob Domain Events erstellt werden können."""
+        """Verifies that domain events can be created."""
         from src.shared.domain.events.domain_event import DomainEvent
         event = DomainEvent()
         assert event.event_id is not None
         assert event.timestamp is not None
 
     def test_suggestion_event_creation(self) -> None:
-        """Prüft ob Suggestion Events erstellt werden können."""
+        """Verifies that suggestion events can be created."""
         from src.suggestion.domain.events import SuggestionCreatedEvent
         event = SuggestionCreatedEvent(
             suggestion_id=1,
@@ -109,7 +109,7 @@ class TestSmokeInstantiation:
         assert event.event_type == "SuggestionCreatedEvent"
 
     def test_demand_result_creation(self) -> None:
-        """Prüft ob DemandResult Entity erstellt werden kann."""
+        """Verifies that a DemandResult entity can be created."""
         from src.demand.domain.entities.demand_result import DemandResult
         result = DemandResult(plz="10115", demand=7500.0, einwohner=15000, count=2)
         assert result.plz == "10115"
@@ -117,16 +117,16 @@ class TestSmokeInstantiation:
 
 
 class TestSmokeExceptions:
-    """Prüft ob Exceptions korrekt geworfen werden."""
+    """Verifies that exceptions are thrown correctly."""
 
     def test_invalid_postal_code_raises(self) -> None:
-        """Prüft ob ungültige PLZ einen Fehler wirft."""
+        """Verifies that an invalid postal code throws an error."""
         from src.shared.domain.value_objects.postal_code import PostalCode
         with pytest.raises(ValueError):
             PostalCode("99999")
 
     def test_invalid_demand_score_raises(self) -> None:
-        """Prüft ob negativer DemandScore einen Fehler wirft."""
+        """Verifies that a negative DemandScore throws an error."""
         from src.demand.domain.value_objects.demand_score import DemandScore
         from src.demand.domain.exceptions import InvalidDemandDataException
         with pytest.raises(InvalidDemandDataException):

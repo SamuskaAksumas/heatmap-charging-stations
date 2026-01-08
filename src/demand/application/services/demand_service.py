@@ -7,7 +7,7 @@ from typing import Optional
 import pandas as pd
 
 from src.demand.domain.events.demand_calculated import on_demand_calculated
-from src.demand.infrastructure.respositories.demand_repository import DemandRepository
+from src.demand.infrastructure.repositories.demand_repository import DemandRepository
 
 
 class DemandService:

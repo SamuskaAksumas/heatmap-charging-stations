@@ -1,7 +1,7 @@
 import pytest
 import pandas as pd
 from src.demand.application.services.demand_service import DemandService
-from src.demand.infrastructure.respositories.in_memory_demand_repository import InMemoryDemandRepository
+from src.demand.infrastructure.repositories.in_memory_demand_repository import InMemoryDemandRepository
 
 @pytest.fixture
 def demand_setup():

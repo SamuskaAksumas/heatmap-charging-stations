@@ -9,7 +9,7 @@ import os
 from config import pdict
 
 # Infrastructure Layer
-from src.demand.infrastructure.respositories.demand_repository import DemandRepository
+from src.demand.infrastructure.repositories.demand_repository import DemandRepository
 from src.shared.infrastructure.repositories.shared_repository import SharedRepository
 
 # Application Layer
