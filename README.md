@@ -2,7 +2,7 @@
 
 **Project Introduction**
 - **Name**: Berlin Geo Heatmap (Project 1)
-- **Purpose**: Visualize the heatmap for the amount of electric charging stations and residents. With this information a 3rd heatmap is being generated to show the demand defined by residents/charging station.
+- **Purpose**: Visualize the heatmap for the amount of electric charging stations and residents. With this information a 3rd heatmap is being generated to show the demand defined by residents/charging station. Additionally, users can suggest new charging station locations via a suggestion form and view previously proposed stations.
 
 ---
 
@@ -44,8 +44,6 @@ For detailed architecture diagrams, see `docs/`.
 ├── README.md                            # This file
 │
 ├── docs/                                # Architecture Documentation
-│   ├── architecture/                    # DDD layer diagrams (draw.io)
-│   └── domain/                          # Domain context diagrams
 │
 ├── src/
 │   ├── presentation/                    # UI Layer
@@ -90,9 +88,6 @@ For detailed architecture diagrams, see `docs/`.
 │   ├── suggestions/                     # Suggestion persistence tests
 │   ├── fakes/                           # Test doubles
 │   └── test_smoke.py                    # Smoke tests for app verification
-│
-└── scripts/                             # Standalone scripts
-    └── compute_demand.py                # Demand computation script
 ```
 
 ---
@@ -250,3 +245,4 @@ python -m pytest -v
 - Shoaib Ur Rehman Khan
 - Chirayu Jain
 - Montasir Hasan Chowdhury
+- Leonie Zeller
