@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-12T12:00:00.000Z" agent="Claude" version="22.1.0">
+  <diagram name="Submit + Review Suggestions" id="suggestions-workflow">
+    <mxGraphModel dx="1200" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Submit + Review Suggestions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=16;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== USER FLOW ==================== -->
+        <mxCell id="user-flow" value="User Flow" style="swimlane;startSize=25;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="500" height="450" as="geometry" />
+        </mxCell>
+
+        <!-- User opens App -->
+        <mxCell id="u-start" value="User opens App" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="180" y="35" width="110" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Select Tab -->
+        <mxCell id="u-select-tab" value="Select Tab" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="185" y="95" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- === LEFT BRANCH: Suggest Location === -->
+        <mxCell id="u-display-form" value="Display Form" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="30" y="160" width="100" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u-enter" value="Enter:&#xa;PLZ, Address,&#xa;Reason" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=9;" vertex="1" parent="user-flow">
+          <mxGeometry x="30" y="215" width="100" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u-valid" value="Valid?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="40" y="285" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u-error" value="Show Error" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="30" y="365" width="100" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u-save" value="Save Suggestion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="160" y="293" width="110" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- === RIGHT BRANCH: View Suggestions === -->
+        <mxCell id="u-load" value="Load All Suggestions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="340" y="160" width="130" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u-display-list" value="Display grouped by PLZ" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="user-flow">
+          <mxGeometry x="340" y="220" width="130" height="35" as="geometry" />
+        </mxCell>
+
+        <mxCell id="u-show-status" value="Show:&#xa;Pending / Approved / Rejected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="user-flow">
+          <mxGeometry x="340" y="280" width="130" height="45" as="geometry" />
+        </mxCell>
+
+        <!-- User Flow Arrows -->
+        <mxCell id="ua1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-start" target="u-select-tab">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-select-tab" target="u-display-form">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ua2-lbl" value="Suggest Location" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="user-flow">
+          <mxGeometry x="90" y="100" width="80" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-select-tab" target="u-load">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ua3-lbl" value="View Suggestions" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="user-flow">
+          <mxGeometry x="290" y="100" width="80" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-display-form" target="u-enter">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-enter" target="u-valid">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-valid" target="u-error">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ua6-lbl" value="Invalid" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="user-flow">
+          <mxGeometry x="50" y="340" width="40" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-valid" target="u-save">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="ua7-lbl" value="Valid" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="user-flow">
+          <mxGeometry x="125" y="293" width="30" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-load" target="u-display-list">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="ua9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="user-flow" source="u-display-list" target="u-show-status">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== ADMIN FLOW ==================== -->
+        <mxCell id="admin-flow" value="Admin Flow" style="swimlane;startSize=25;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="560" y="50" width="320" height="450" as="geometry" />
+        </mxCell>
+
+        <!-- Admin enters password -->
+        <mxCell id="a-password" value="Admin enters password" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="90" y="35" width="140" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Correct? -->
+        <mxCell id="a-correct" value="Correct?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="120" y="90" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Access Denied -->
+        <mxCell id="a-denied" value="Access Denied" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="20" y="100" width="90" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Show Admin Buttons -->
+        <mxCell id="a-buttons" value="Show Admin Buttons" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="90" y="160" width="140" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Select Suggestion -->
+        <mxCell id="a-select" value="Select Suggestion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;strokeWidth=2;dashed=1;" vertex="1" parent="admin-flow">
+          <mxGeometry x="90" y="215" width="140" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Action? -->
+        <mxCell id="a-action" value="Action?" style="rhombus;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="120" y="270" width="80" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Set approved -->
+        <mxCell id="a-approve" value="Set: approved" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="20" y="340" width="90" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Set rejected -->
+        <mxCell id="a-reject" value="Set: rejected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="120" y="340" width="90" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Add notes -->
+        <mxCell id="a-notes" value="Add notes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="220" y="340" width="80" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Save & Refresh -->
+        <mxCell id="a-save" value="Save &amp; Refresh" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="100" y="400" width="120" height="35" as="geometry" />
+        </mxCell>
+
+        <!-- Admin Flow Arrows -->
+        <mxCell id="aa1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-password" target="a-correct">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-correct" target="a-denied">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa2-lbl" value="No" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="admin-flow">
+          <mxGeometry x="85" y="100" width="25" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-correct" target="a-buttons">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa3-lbl" value="Yes" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="admin-flow">
+          <mxGeometry x="165" y="143" width="25" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-buttons" target="a-select">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-select" target="a-action">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-action" target="a-approve">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa6-lbl" value="Approve" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="admin-flow">
+          <mxGeometry x="45" y="305" width="45" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-action" target="a-reject">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa7-lbl" value="Reject" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="admin-flow">
+          <mxGeometry x="145" y="320" width="35" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-action" target="a-notes">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa8-lbl" value="Notes" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="admin-flow">
+          <mxGeometry x="220" y="305" width="35" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-approve" target="a-save">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-reject" target="a-save">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-notes" target="a-save">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== DATABASE ==================== -->
+        <mxCell id="db" value="suggestions.json" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=10;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="180" y="530" width="120" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Database Arrows -->
+        <mxCell id="db-write" value="write" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#999999;endArrow=classic;dashed=1;fontSize=9;" edge="1" parent="1" source="u-save" target="db">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="db-read" value="read" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#999999;endArrow=classic;dashed=1;fontSize=9;" edge="1" parent="1" source="db" target="u-load">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="450" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="db-update" value="update" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#999999;endArrow=classic;dashed=1;fontSize=9;" edge="1" parent="1" source="a-save" target="db">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="720" y="560" />
+              <mxPoint x="300" y="560" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

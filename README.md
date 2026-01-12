@@ -22,10 +22,10 @@ This project follows **Domain-Driven Design (DDD)** principles with a layered ar
         |
         v
 +------------------+
-|     Domain       |  <- Entities, Value Objects, Events, Repository Interfaces
+|     Domain       |  <- Entities, Value Objects, Exceptions
 +------------------+
-        ^
         |
+        v
 +------------------+
 |  Infrastructure  |  <- Repositories, Preprocessing, Utils
 +------------------+
@@ -43,7 +43,7 @@ For detailed architecture diagrams, see `docs/`.
 ├── config.py                            # Configuration (pdict)
 ├── README.md                            # This file
 │
-├── docs/                                # Architecture Documentation
+├── docs/                                # Architecture Documentation & Diagrams
 │
 ├── src/
 │   ├── presentation/                    # UI Layer
@@ -53,10 +53,9 @@ For detailed architecture diagrams, see `docs/`.
 │   │
 │   ├── shared/                          # Shared Bounded Context
 │   │   ├── domain/
-│   │   │   ├── value_objects/           # PostalCode
-│   │   │   ├── events/                  # DomainEvent base class
-│   │   │   ├── exceptions/              # DomainException, InvalidPostalCodeException
-│   │   │   └── repositories/            # BaseRepository interface
+│   │   │   ├── value_objects/           # PostalCode (validates Berlin PLZ)
+│   │   │   ├── events/                  # Data processing functions
+│   │   │   └── exceptions/              # DomainException
 │   │   ├── application/services/        # shared_service.py
 │   │   └── infrastructure/
 │   │       ├── preprocessing/           # stations.py, residents.py, geo_utils.py
@@ -64,29 +63,21 @@ For detailed architecture diagrams, see `docs/`.
 │   │       └── utils/                   # helper_tools.py (timer)
 │   │
 │   ├── demand/                          # Demand Bounded Context
-│   │   ├── domain/
-│   │   │   ├── entities/                # DemandResult (rich domain model)
-│   │   │   ├── value_objects/           # DemandScore
-│   │   │   ├── events/                  # DemandCalculatedEvent
-│   │   │   ├── exceptions/              # InvalidDemandDataException
-│   │   │   └── repositories/            # DemandRepositoryInterface
+│   │   ├── domain/events/               # on_demand_calculated(), display_demand()
 │   │   ├── application/services/        # demand_service.py
-│   │   └── infrastructure/repositories/ # demand_repository.py, in_memory_...
+│   │   └── infrastructure/repositories/ # demand_repository.py (in-memory cache)
 │   │
 │   └── suggestion/                      # Suggestion Bounded Context
 │       ├── domain/
-│       │   ├── entities/                # ChargingSuggestion (rich domain model)
-│       │   ├── events/                  # SuggestionCreatedEvent, SuggestionReviewedEvent
-│       │   ├── exceptions/              # InvalidSuggestionException
-│       │   └── repositories/            # SuggestionRepositoryInterface
+│       │   ├── entities/                # ChargingSuggestion (Entity + State Machine)
+│       │   └── exceptions/              # InvalidSuggestionException
 │       ├── application/services/        # suggestion_service.py
-│       └── infrastructure/repositories/ # suggestion_repository.py, in_memory_...
+│       └── infrastructure/repositories/ # suggestion_repository.py (JSON file)
 │
-├── tests/                               # Test Suite
+├── tests/                               # Test Suite (51 tests)
 │   ├── shared/                          # PostalCode tests
 │   ├── demand/                          # Demand logic tests
-│   ├── suggestions/                     # Suggestion persistence tests
-│   ├── fakes/                           # Test doubles
+│   ├── suggestion/                      # Suggestion persistence tests
 │   └── test_smoke.py                    # Smoke tests for app verification
 ```
 
@@ -111,37 +102,37 @@ For detailed architecture diagrams, see `docs/`.
 #### i. Shared Context (`src/shared/`)
 *Foundation: Common components used across all contexts*
 
-- **Value Objects**: `PostalCode` - Berlin PLZ validation (10000-14200)
-- **Domain Events**: `DomainEvent` - Base class with event_id, timestamp
-- **Exceptions**: `DomainException`, `InvalidPostalCodeException`
-- **Repository Interface**: `BaseRepository` - Generic CRUD interface
+- **Value Object**: `PostalCode` - Berlin PLZ validation (10000-14200)
+- **Exception**: `DomainException` - Base class for domain errors
 - **Preprocessing**: `preprop_lstat()`, `preprop_resid()`, `sort_by_plz_add_geometry()`
 - **Utils**: `timer` decorator for performance logging
 
 #### ii. Demand Context (`src/demand/`)
 *Brain: Calculates where new charging stations are needed*
 
-- **Entity**: `DemandResult` - Rich domain model with:
-  - `get_demand_category()` - Returns 'critical', 'high', 'medium', 'low', 'satisfied'
-  - `is_high_demand()`, `is_medium_demand()` - Categorization methods
-  - `get_priority_rank()` - Priority for infrastructure planning
-- **Value Object**: `DemandScore` - Validates non-negative demand values
-- **Domain Event**: `DemandCalculatedEvent` - Captures calculation results
-- **Service**: `DemandService` - Thin orchestrator for calculation workflow
+- **Domain Functions**:
+  - `on_demand_calculated()` - Calculates demand = residents / stations per PLZ
+  - `display_demand()` - Renders heatmap layer (yellow → red)
+- **Service**: `DemandService` - Orchestrates calculation and caching
+- **Repository**: `DemandRepository` - In-memory cache for results
 
 #### iii. Suggestion Context (`src/suggestion/`)
 *Interaction: Manages user suggestions for new charging locations*
 
-- **Entity**: `ChargingSuggestion` - Rich domain model with:
-  - Status transitions: pending -> approved/rejected -> deleted
-  - `approve()`, `reject()`, `delete()` - Business methods
-  - `can_transition_to()` - Status validation
-- **Domain Events**: `SuggestionCreatedEvent`, `SuggestionReviewedEvent`
+- **Entity**: `ChargingSuggestion` - Domain model with State Machine:
+  - Status transitions: `pending` → `approved`/`rejected` → `deleted`
+  - Methods: `approve()`, `reject()`, `delete()`, `can_transition_to()`
+  - Validates PLZ using shared `PostalCode` value object
+- **Exception**: `InvalidSuggestionException` - For validation and transition errors
 - **Service**: `SuggestionService` - Thin orchestrator for CRUD operations
+- **Repository**: `SuggestionRepository` - JSON file persistence with:
+  - `add()` - Assigns ID, timestamp, status='pending'
+  - `get_all()` - Returns visible suggestions (filters deleted)
+  - `update()` - Saves changes after review
 
 ### 4. Testing (`tests/`)
 - **TDD approach**: Red-Green-Refactor cycle
-- **50 tests** covering:
+- **51 tests** covering:
   - Unit tests with `@pytest.mark.parametrize` for edge cases
   - Smoke tests for app-level verification
   - In-memory repositories for isolation

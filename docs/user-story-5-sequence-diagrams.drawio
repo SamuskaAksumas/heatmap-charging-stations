@@ -63,15 +63,7 @@
           </mxGeometry>
         </mxCell>
 
-        <mxCell id="p1-ent" value="DemandResult&#xa;(Rich Entity)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontStyle=1;fontSize=10;" vertex="1" parent="1">
-          <mxGeometry x="790" y="50" width="100" height="50" as="geometry" />
-        </mxCell>
-        <mxCell id="p1-ent-line" value="" style="endArrow=none;dashed=1;html=1;dashPattern=1 3;strokeWidth=1;strokeColor=#999999;" edge="1" parent="1">
-          <mxGeometry width="50" height="50" relative="1" as="geometry">
-            <mxPoint x="840" y="110" as="sourcePoint" />
-            <mxPoint x="840" y="700" as="targetPoint" />
-          </mxGeometry>
-        </mxCell>
+        <!-- DemandResult removed - architecture uses DataFrames directly -->
 
         <mxCell id="p1-repo" value="DemandRepository&#xa;(Infrastructure)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontStyle=1;fontSize=10;" vertex="1" parent="1">
           <mxGeometry x="940" y="50" width="110" height="50" as="geometry" />

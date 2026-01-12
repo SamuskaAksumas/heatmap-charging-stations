@@ -1,319 +1,226 @@
-<mxfile host="app.diagrams.net" modified="2024-01-02T12:00:00.000Z" agent="Claude" version="22.1.0">
-  <diagram name="Domain Event Flow - Detailed" id="domain-event-flow-detailed">
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2024-01-12T12:00:00.000Z" agent="Claude" version="22.1.0">
+  <diagram name="Domain Flow - Suggestion with State Machine" id="suggestion-domain-flow">
     <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="900" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="Domain Event Flow - User Story 7: Submit Suggestions" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
-          <mxGeometry x="400" y="10" width="500" height="30" as="geometry" />
+        <mxCell id="title" value="Domain Flow - User Story 7: Suggestion Management with State Machine" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+          <mxGeometry x="350" y="10" width="600" height="30" as="geometry" />
         </mxCell>
 
         <!-- ==================== PRESENTATION LAYER ==================== -->
-        <mxCell id="ui-layer" value="Presentation Layer (src/presentation/)" style="swimlane;startSize=25;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="50" width="1300" height="140" as="geometry" />
+        <mxCell id="ui-layer" value="Presentation Layer (src/presentation/components/)" style="swimlane;startSize=25;fillColor=#e3f2fd;strokeColor=#1976d2;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="1300" height="120" as="geometry" />
         </mxCell>
 
-        <!-- User Input Subgroup -->
-        <mxCell id="input-group" value="User Input" style="swimlane;startSize=20;fillColor=#fff3e0;strokeColor=#e65100;fontSize=10;horizontal=1;" vertex="1" parent="ui-layer">
-          <mxGeometry x="20" y="35" width="380" height="95" as="geometry" />
+        <mxCell id="ui-form" value="suggestion_form.py&#xa;User submits:&#xa;PLZ, Address, Reason" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=9;align=center;" vertex="1" parent="ui-layer">
+          <mxGeometry x="40" y="35" width="150" height="70" as="geometry" />
         </mxCell>
 
-        <mxCell id="in1" value="Form Submit&#xa;───────────&#xa;plz: str&#xa;address: str&#xa;reason: str" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc80;strokeColor=#e65100;fontSize=9;align=center;" vertex="1" parent="input-group">
-          <mxGeometry x="10" y="25" width="110" height="65" as="geometry" />
+        <mxCell id="ui-list" value="suggestion_list.py&#xa;Admin reviews&#xa;(Approve/Reject/Delete)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=9;align=center;" vertex="1" parent="ui-layer">
+          <mxGeometry x="500" y="35" width="160" height="70" as="geometry" />
         </mxCell>
 
-        <mxCell id="in2" value="View Tab Click" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc80;strokeColor=#e65100;fontSize=9;align=center;" vertex="1" parent="input-group">
-          <mxGeometry x="135" y="35" width="100" height="40" as="geometry" />
-        </mxCell>
-
-        <mxCell id="in3" value="Admin Review&#xa;───────────&#xa;id, status,&#xa;reviewer, notes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc80;strokeColor=#e65100;fontSize=9;align=center;" vertex="1" parent="input-group">
-          <mxGeometry x="250" y="25" width="115" height="65" as="geometry" />
-        </mxCell>
-
-        <!-- Validation (Basic UI) -->
-        <mxCell id="validation" value="Basic Validation&#xa;─────────────&#xa;(UI-side checks)&#xa;Full validation in Entity" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;fontSize=9;align=center;" vertex="1" parent="ui-layer">
-          <mxGeometry x="440" y="45" width="130" height="80" as="geometry" />
-        </mxCell>
-
-        <!-- Display Output Subgroup -->
-        <mxCell id="output-group" value="Display Output" style="swimlane;startSize=20;fillColor=#e8f5e9;strokeColor=#2e7d32;fontSize=10;horizontal=1;" vertex="1" parent="ui-layer">
-          <mxGeometry x="920" y="35" width="360" height="95" as="geometry" />
-        </mxCell>
-
-        <mxCell id="out1" value="Success Message&#xa;st.success()&#xa;st.balloons()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="output-group">
-          <mxGeometry x="10" y="30" width="105" height="55" as="geometry" />
-        </mxCell>
-
-        <mxCell id="out2" value="Suggestions List&#xa;(grouped by PLZ)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="output-group">
-          <mxGeometry x="125" y="35" width="105" height="45" as="geometry" />
-        </mxCell>
-
-        <mxCell id="out3" value="Updated Status&#xa;st.rerun()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="output-group">
-          <mxGeometry x="245" y="35" width="100" height="45" as="geometry" />
-        </mxCell>
-
-        <!-- Arrow: Input to Validation -->
-        <mxCell id="arr-in-val" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="ui-layer" source="input-group" target="validation">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="ui-result" value="Display Result:&#xa;Success / Error Message" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=9;align=center;" vertex="1" parent="ui-layer">
+          <mxGeometry x="1100" y="35" width="160" height="70" as="geometry" />
         </mxCell>
 
         <!-- ==================== APPLICATION LAYER ==================== -->
-        <mxCell id="app-layer" value="Application Layer" style="swimlane;startSize=25;fillColor=#e8f5e9;strokeColor=#4caf50;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="210" width="1300" height="120" as="geometry" />
+        <mxCell id="app-layer" value="Application Layer (src/suggestion/application/services/)" style="swimlane;startSize=25;fillColor=#e8f5e9;strokeColor=#4caf50;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="190" width="1300" height="110" as="geometry" />
         </mxCell>
 
-        <!-- SuggestionService -->
-        <mxCell id="service" value="SuggestionService" style="swimlane;startSize=20;fillColor=#c8e6c9;strokeColor=#2e7d32;fontStyle=1;fontSize=11;horizontal=1;" vertex="1" parent="app-layer">
-          <mxGeometry x="400" y="30" width="500" height="80" as="geometry" />
+        <mxCell id="svc-create" value="SuggestionService&#xa;.create_suggestion(plz, address, reason)&#xa;Creates new suggestion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="app-layer">
+          <mxGeometry x="200" y="35" width="200" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="svc1" value="create_suggestion()&#xa;(plz, address, reason)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="service">
-          <mxGeometry x="15" y="28" width="140" height="45" as="geometry" />
-        </mxCell>
-
-        <mxCell id="svc2" value="get_all_suggestions()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="service">
-          <mxGeometry x="175" y="28" width="140" height="45" as="geometry" />
-        </mxCell>
-
-        <mxCell id="svc3" value="review_suggestion()&#xa;(id, status, reviewer, notes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="service">
-          <mxGeometry x="335" y="28" width="150" height="45" as="geometry" />
+        <mxCell id="svc-review" value="SuggestionService&#xa;.review_suggestion(id, status, reviewer)&#xa;Uses Entity State Machine!" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;fontStyle=1;" vertex="1" parent="app-layer">
+          <mxGeometry x="550" y="35" width="220" height="60" as="geometry" />
         </mxCell>
 
         <!-- ==================== DOMAIN LAYER ==================== -->
-        <mxCell id="domain-layer" value="Domain Layer" style="swimlane;startSize=25;fillColor=#fff9c4;strokeColor=#f9a825;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="350" width="1300" height="130" as="geometry" />
+        <mxCell id="domain-layer" value="Domain Layer (src/suggestion/domain/)" style="swimlane;startSize=25;fillColor=#fff9c4;strokeColor=#f9a825;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="320" width="1300" height="180" as="geometry" />
         </mxCell>
 
-        <!-- Rich Entity Subgroup -->
-        <mxCell id="entity-group" value="Rich Entity" style="swimlane;startSize=20;fillColor=#dcedc8;strokeColor=#689f38;fontSize=10;horizontal=1;" vertex="1" parent="domain-layer">
-          <mxGeometry x="80" y="30" width="200" height="90" as="geometry" />
+        <!-- Rich Entity with State Machine -->
+        <mxCell id="entity-box" value="ChargingSuggestion Entity (Rich Domain Model)&#xa;────────────────────────────────&#xa;Attributes: plz, address, reason, status, reviewed_by, review_date&#xa;&#xa;State Machine Methods:&#xa;• approve(reviewer, notes) - validates transition, sets status&#xa;• reject(reviewer, notes) - validates transition, sets status&#xa;• delete(reviewer, notes) - validates transition, sets status&#xa;• can_transition_to(new_status) - checks if transition is valid" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;align=left;spacingLeft=10;" vertex="1" parent="domain-layer">
+          <mxGeometry x="40" y="35" width="380" height="130" as="geometry" />
         </mxCell>
 
-        <mxCell id="entity" value="&lt;&lt;Rich Entity&gt;&gt;&#xa;ChargingSuggestion&#xa;───────────────&#xa;+ approve() | reject()&#xa;+ can_transition_to()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcedc8;strokeColor=#689f38;fontSize=9;align=center;" vertex="1" parent="entity-group">
-          <mxGeometry x="20" y="25" width="160" height="60" as="geometry" />
+        <!-- State Machine Rules -->
+        <mxCell id="state-machine" value="VALID_STATUS_TRANSITIONS&#xa;────────────────────&#xa;'pending' → ['approved', 'rejected', 'deleted']&#xa;'approved' → ['deleted']&#xa;'rejected' → ['deleted']&#xa;'deleted' → []  (terminal state)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffecb3;strokeColor=#ff8f00;fontSize=9;align=left;fontFamily=Courier New;spacingLeft=10;" vertex="1" parent="domain-layer">
+          <mxGeometry x="450" y="35" width="280" height="100" as="geometry" />
         </mxCell>
 
-        <!-- Domain Events + Exceptions Subgroup -->
-        <mxCell id="func-group" value="Domain Events &amp; Exceptions" style="swimlane;startSize=20;fillColor=#f3e5f5;strokeColor=#7b1fa2;fontSize=10;horizontal=1;" vertex="1" parent="domain-layer">
-          <mxGeometry x="500" y="30" width="550" height="90" as="geometry" />
+        <!-- PostalCode Validation -->
+        <mxCell id="postal-code" value="PostalCode Value Object&#xa;(src/shared/domain/value_objects/)&#xa;────────────────────&#xa;Validates Berlin PLZ: 10000-14200&#xa;Immutable (frozen=True)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=9;align=center;" vertex="1" parent="domain-layer">
+          <mxGeometry x="760" y="35" width="200" height="90" as="geometry" />
         </mxCell>
 
-        <mxCell id="df1" value="&lt;&lt;Domain Event&gt;&gt;&#xa;SuggestionCreatedEvent&#xa;───────────&#xa;suggestion_id, plz" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=9;align=center;" vertex="1" parent="func-group">
-          <mxGeometry x="15" y="25" width="150" height="60" as="geometry" />
+        <!-- Exception -->
+        <mxCell id="exception" value="InvalidSuggestionException&#xa;────────────────────&#xa;Raised when:&#xa;• Invalid PLZ (via PostalCode)&#xa;• Invalid status transition" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcdd2;strokeColor=#c62828;fontSize=9;align=center;" vertex="1" parent="domain-layer">
+          <mxGeometry x="990" y="35" width="180" height="90" as="geometry" />
         </mxCell>
 
-        <mxCell id="df2" value="&lt;&lt;Domain Event&gt;&gt;&#xa;SuggestionReviewedEvent&#xa;───────────&#xa;suggestion_id, new_status" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=9;align=center;" vertex="1" parent="func-group">
-          <mxGeometry x="190" y="25" width="160" height="60" as="geometry" />
-        </mxCell>
-
-        <mxCell id="df3" value="&lt;&lt;Exception&gt;&gt;&#xa;InvalidSuggestionException&#xa;───────────&#xa;Raised by Entity validation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=9;align=center;" vertex="1" parent="func-group">
-          <mxGeometry x="375" y="25" width="160" height="60" as="geometry" />
-        </mxCell>
 
         <!-- ==================== INFRASTRUCTURE LAYER ==================== -->
-        <mxCell id="infra-layer" value="Infrastructure Layer" style="swimlane;startSize=25;fillColor=#d1e7dd;strokeColor=#198754;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="500" width="1300" height="110" as="geometry" />
+        <mxCell id="infra-layer" value="Infrastructure Layer (src/suggestion/infrastructure/repositories/)" style="swimlane;startSize=25;fillColor=#d1e7dd;strokeColor=#198754;fontStyle=1;fontSize=12;horizontal=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="520" width="1300" height="100" as="geometry" />
         </mxCell>
 
-        <!-- Repository Subgroup -->
-        <mxCell id="repo-group" value="Repository (implements Interface)" style="swimlane;startSize=20;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=10;horizontal=1;" vertex="1" parent="infra-layer">
-          <mxGeometry x="400" y="30" width="300" height="70" as="geometry" />
+        <mxCell id="repo" value="SuggestionRepository&#xa;JSON file: data/suggestions.json" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;fontSize=9;align=center;" vertex="1" parent="infra-layer">
+          <mxGeometry x="400" y="35" width="200" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="repo" value="SuggestionRepository&#xa;(implements SuggestionRepositoryInterface)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=9;align=center;" vertex="1" parent="repo-group">
-          <mxGeometry x="15" y="25" width="270" height="40" as="geometry" />
+        <mxCell id="repo-inmem" value="InMemorySuggestionRepository&#xa;For testing (no file I/O)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;fontSize=9;align=center;" vertex="1" parent="infra-layer">
+          <mxGeometry x="650" y="35" width="200" height="50" as="geometry" />
         </mxCell>
 
-        <!-- Storage -->
-        <mxCell id="storage-group" value="Storage" style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;horizontal=1;" vertex="1" parent="infra-layer">
-          <mxGeometry x="800" y="30" width="150" height="70" as="geometry" />
-        </mxCell>
+        <!-- ==================== ARROWS ==================== -->
 
-        <mxCell id="json" value="suggestions.json" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=8;fillColor=#f5f5f5;strokeColor=#666666;fontSize=10;" vertex="1" parent="storage-group">
-          <mxGeometry x="30" y="22" width="90" height="45" as="geometry" />
-        </mxCell>
-
-        <!-- Arrow: Repo to JSON -->
-        <mxCell id="arr-repo-json" value="read/write" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;" edge="1" parent="infra-layer" source="repo-group" target="storage-group">
+        <!-- SUBMIT FLOW (Blue) -->
+        <!-- UI Form to Service Create -->
+        <mxCell id="arr1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="ui-form" target="svc-create">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- ==================== ARROWS BETWEEN LAYERS ==================== -->
-
-        <!-- UI Validation to Service (valid data) - CREATE FLOW -->
-        <mxCell id="arr-val-svc1" value="valid" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;strokeColor=#2e7d32;entryX=0.15;entryY=0;" edge="1" parent="1" source="validation" target="service">
-          <mxGeometry relative="1" as="geometry">
-            <mxPoint x="505" y="200" as="targetPoint" />
-          </mxGeometry>
+        <mxCell id="arr1-lbl" value="1. Submit" style="text;fontSize=9;fontColor=#1976d2;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="150" y="170" width="50" height="15" as="geometry" />
         </mxCell>
 
-        <!-- UI Input2 to Service (VIEW FLOW) -->
-        <mxCell id="arr-in2-svc2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;strokeColor=#1976d2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="in2" target="svc2">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="245" y="195" />
-              <mxPoint x="685" y="195" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- UI Input3 to Service (REVIEW FLOW) -->
-        <mxCell id="arr-in3-svc3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;strokeColor=#7b1fa2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="in3" target="svc3">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="368" y="200" />
-              <mxPoint x="860" y="200" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Service to Entity (creates) -->
-        <mxCell id="arr-svc-ent" value="creates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#689f38;" edge="1" parent="1" source="svc1" target="entity-group">
-          <mxGeometry relative="1" as="geometry">
-            <Array as="points">
-              <mxPoint x="525" y="340" />
-              <mxPoint x="180" y="340" />
-            </Array>
-          </mxGeometry>
-        </mxCell>
-
-        <!-- Service to Domain Functions (calls) -->
-        <mxCell id="arr-svc1-df1" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#7b1fa2;" edge="1" parent="1" source="svc1" target="df1">
+        <!-- Service Create to Entity -->
+        <mxCell id="arr2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#1976d2;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="svc-create" target="entity-box">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <mxCell id="arr-svc2-df2" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#7b1fa2;" edge="1" parent="1" source="svc2" target="df2">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="arr2-lbl" value="2. Create Entity&#xa;(validates via PostalCode)" style="text;fontSize=9;fontColor=#1976d2;align=center;" vertex="1" parent="1">
+          <mxGeometry x="250" y="300" width="120" height="25" as="geometry" />
         </mxCell>
 
-        <mxCell id="arr-svc3-df3" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#7b1fa2;" edge="1" parent="1" source="svc3" target="df3">
+        <!-- REVIEW FLOW (Orange) -->
+        <!-- UI List to Service Review -->
+        <mxCell id="arr3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#ff9800;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="ui-list" target="svc-review">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-
-        <!-- Service to Repository -->
-        <mxCell id="arr-svc-repo" value="fetch / add / save" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;strokeColor=#1976d2;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="service" target="repo-group">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="arr3-lbl" value="3. Review" style="text;fontSize=9;fontColor=#ff9800;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="595" y="170" width="50" height="15" as="geometry" />
         </mxCell>
 
-        <!-- Return arrows to UI Output -->
-        <mxCell id="arr-repo-out1" value="success" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#2e7d32;exitX=1;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="1" source="repo" target="out1">
+        <!-- Service Review to Entity (State Machine) -->
+        <mxCell id="arr4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#ff9800;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="svc-review" target="entity-box">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1030" y="555" />
-              <mxPoint x="1030" y="185" />
+              <mxPoint x="660" y="310" />
+              <mxPoint x="300" y="310" />
             </Array>
           </mxGeometry>
         </mxCell>
+        <mxCell id="arr4-lbl" value="4. entity.approve() / reject() / delete()&#xa;(State Machine validates transition!)" style="text;fontSize=9;fontColor=#ff9800;align=center;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="360" y="300" width="200" height="25" as="geometry" />
+        </mxCell>
 
-        <mxCell id="arr-repo-out2" value="List[dict]" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#1976d2;exitX=1;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="1" source="repo" target="out2">
+        <!-- SHARED (Gray) -->
+        <!-- Entity to Repository -->
+        <mxCell id="arr5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;" edge="1" parent="1" source="entity-box" target="repo">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1140" y="555" />
-              <mxPoint x="1140" y="185" />
+              <mxPoint x="230" y="510" />
+              <mxPoint x="500" y="510" />
             </Array>
           </mxGeometry>
         </mxCell>
+        <mxCell id="arr5-lbl" value="5. Save" style="text;fontSize=9;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="350" y="500" width="40" height="15" as="geometry" />
+        </mxCell>
 
-        <mxCell id="arr-repo-out3" value="OK" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=9;dashed=1;strokeColor=#7b1fa2;exitX=1;exitY=0.5;entryX=0.5;entryY=1;" edge="1" parent="1" source="repo" target="out3">
+        <!-- Repository to Result -->
+        <mxCell id="arr6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;dashed=1;" edge="1" parent="1" source="repo" target="ui-result">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="1250" y="555" />
-              <mxPoint x="1250" y="185" />
+              <mxPoint x="1000" y="580" />
+              <mxPoint x="1000" y="630" />
+              <mxPoint x="1180" y="630" />
+              <mxPoint x="1180" y="170" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="arr6-lbl" value="6. Result" style="text;fontSize=9;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="1190" y="150" width="50" height="15" as="geometry" />
         </mxCell>
 
         <!-- ==================== LEGEND ==================== -->
-        <mxCell id="legend" value="LEGEND" style="swimlane;startSize=20;fillColor=#fafafa;strokeColor=#666666;fontSize=10;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="40" y="630" width="600" height="100" as="geometry" />
+        <mxCell id="legend" value="Legend" style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="640" width="700" height="90" as="geometry" />
         </mxCell>
 
-        <!-- Legend Row 1 -->
-        <mxCell id="leg1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffcc80;strokeColor=#e65100;" vertex="1" parent="legend">
-          <mxGeometry x="10" y="30" width="20" height="14" as="geometry" />
+        <!-- Layer Colors Row -->
+        <mxCell id="leg-layers-title" value="Layers:" style="text;fontSize=9;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="25" width="40" height="15" as="geometry" />
         </mxCell>
-        <mxCell id="leg1-txt" value="User Input" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="35" y="28" width="60" height="18" as="geometry" />
+        <mxCell id="leg-pres-txt" value="Presentation" style="text;fontSize=9;fillColor=#e3f2fd;strokeColor=#1976d2;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="55" y="25" width="70" height="18" as="geometry" />
         </mxCell>
-
-        <mxCell id="leg2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a5d6a7;strokeColor=#2e7d32;" vertex="1" parent="legend">
-          <mxGeometry x="100" y="30" width="20" height="14" as="geometry" />
+        <mxCell id="leg-app-txt" value="Application" style="text;fontSize=9;fillColor=#e8f5e9;strokeColor=#4caf50;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="135" y="25" width="65" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="leg2-txt" value="Display Output" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="125" y="28" width="70" height="18" as="geometry" />
+        <mxCell id="leg-dom-txt" value="Domain" style="text;fontSize=9;fillColor=#fff9c4;strokeColor=#f9a825;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="210" y="25" width="50" height="18" as="geometry" />
         </mxCell>
-
-        <mxCell id="leg3" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#666666;" vertex="1" parent="legend">
-          <mxGeometry x="200" y="30" width="20" height="14" as="geometry" />
+        <mxCell id="leg-infra-txt" value="Infrastructure" style="text;fontSize=9;fillColor=#d1e7dd;strokeColor=#198754;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="270" y="25" width="75" height="18" as="geometry" />
         </mxCell>
-        <mxCell id="leg3-txt" value="Validation" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="225" y="28" width="55" height="18" as="geometry" />
+        <mxCell id="leg-vo-txt" value="Value Object" style="text;fontSize=9;fillColor=#e1bee7;strokeColor=#7b1fa2;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="355" y="25" width="72" height="18" as="geometry" />
         </mxCell>
-
-        <mxCell id="leg4" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;" vertex="1" parent="legend">
-          <mxGeometry x="285" y="30" width="20" height="14" as="geometry" />
-        </mxCell>
-        <mxCell id="leg4-txt" value="Service" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="310" y="28" width="45" height="18" as="geometry" />
+        <mxCell id="leg-err-txt" value="Exception" style="text;fontSize=9;fillColor=#ffcdd2;strokeColor=#c62828;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="437" y="25" width="60" height="18" as="geometry" />
         </mxCell>
 
-        <mxCell id="leg5" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcedc8;strokeColor=#689f38;" vertex="1" parent="legend">
-          <mxGeometry x="360" y="30" width="20" height="14" as="geometry" />
-        </mxCell>
-        <mxCell id="leg5-txt" value="Entity" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="385" y="28" width="40" height="18" as="geometry" />
+        <!-- Flow Arrows Row -->
+        <mxCell id="leg-flows-title" value="Flows:" style="text;fontSize=9;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="55" width="40" height="15" as="geometry" />
         </mxCell>
 
-        <mxCell id="leg6" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;" vertex="1" parent="legend">
-          <mxGeometry x="430" y="30" width="20" height="14" as="geometry" />
+        <mxCell id="leg-submit" value="" style="endArrow=classic;html=1;strokeColor=#1976d2;strokeWidth=2;" edge="1" parent="legend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="55" y="62" as="sourcePoint" />
+            <mxPoint x="95" y="62" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="leg6-txt" value="Domain Function" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="455" y="28" width="85" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg7" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;" vertex="1" parent="legend">
-          <mxGeometry x="545" y="30" width="20" height="14" as="geometry" />
-        </mxCell>
-        <mxCell id="leg7-txt" value="Repository" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="570" y="28" width="55" height="18" as="geometry" />
+        <mxCell id="leg-submit-txt" value="Submit Flow" style="text;fontSize=9;fontColor=#1976d2;" vertex="1" parent="legend">
+          <mxGeometry x="100" y="55" width="70" height="15" as="geometry" />
         </mxCell>
 
-        <!-- Legend Row 2 -->
-        <mxCell id="leg8-txt" value="─── Request/Call" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="10" y="55" width="100" height="18" as="geometry" />
+        <mxCell id="leg-review" value="" style="endArrow=classic;html=1;strokeColor=#ff9800;strokeWidth=2;" edge="1" parent="legend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="180" y="62" as="sourcePoint" />
+            <mxPoint x="220" y="62" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-review-txt" value="Review Flow" style="text;fontSize=9;fontColor=#ff9800;" vertex="1" parent="legend">
+          <mxGeometry x="225" y="55" width="70" height="15" as="geometry" />
         </mxCell>
 
-        <mxCell id="leg9-txt" value="- - - Return/Response" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="120" y="55" width="110" height="18" as="geometry" />
+        <mxCell id="leg-shared" value="" style="endArrow=classic;html=1;strokeColor=#666666;strokeWidth=2;" edge="1" parent="legend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="305" y="62" as="sourcePoint" />
+            <mxPoint x="345" y="62" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-shared-txt" value="Shared" style="text;fontSize=9;fontColor=#666666;" vertex="1" parent="legend">
+          <mxGeometry x="350" y="55" width="45" height="15" as="geometry" />
         </mxCell>
 
-        <!-- Flow Colors -->
-        <mxCell id="leg10" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#2e7d32;" vertex="1" parent="legend">
-          <mxGeometry x="250" y="57" width="30" height="4" as="geometry" />
+        <mxCell id="leg-dashed" value="" style="endArrow=classic;html=1;strokeColor=#666666;strokeWidth=2;dashed=1;" edge="1" parent="legend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="410" y="62" as="sourcePoint" />
+            <mxPoint x="450" y="62" as="targetPoint" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="leg10-txt" value="CREATE Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="285" y="52" width="70" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg11" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#1976d2;" vertex="1" parent="legend">
-          <mxGeometry x="360" y="57" width="30" height="4" as="geometry" />
-        </mxCell>
-        <mxCell id="leg11-txt" value="VIEW Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="395" y="52" width="60" height="18" as="geometry" />
-        </mxCell>
-
-        <mxCell id="leg12" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#7b1fa2;" vertex="1" parent="legend">
-          <mxGeometry x="460" y="57" width="30" height="4" as="geometry" />
-        </mxCell>
-        <mxCell id="leg12-txt" value="REVIEW Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;" vertex="1" parent="legend">
-          <mxGeometry x="495" y="52" width="70" height="18" as="geometry" />
-        </mxCell>
-
-        <!-- Legend Row 3 - Note -->
-        <mxCell id="leg-note" value="Note: Rich Entity contains business logic (approve/reject). Service is thin orchestrator." style="text;html=1;strokeColor=none;fillColor=none;align=left;fontSize=9;fontStyle=2;" vertex="1" parent="legend">
-          <mxGeometry x="10" y="75" width="450" height="18" as="geometry" />
+        <mxCell id="leg-dashed-txt" value="Response" style="text;fontSize=9;fontColor=#666666;" vertex="1" parent="legend">
+          <mxGeometry x="455" y="55" width="55" height="15" as="geometry" />
         </mxCell>
 
       </root>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<mxfile host="app.diagrams.net" modified="2024-01-02T12:00:00.000Z" agent="Claude" version="22.1.0">
+<mxfile host="app.diagrams.net" modified="2024-01-12T12:00:00.000Z" agent="Claude" version="22.1.0">
   <diagram name="Domain Event Flow - Demand" id="demand-domain-flow">
     <mxGraphModel dx="1100" dy="700" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="700" math="0" shadow="0">
       <root>
@@ -7,8 +7,8 @@
         <mxCell id="1" parent="0" />
 
         <!-- Title -->
-        <mxCell id="title" value="Domain Event Flow - User Story 5: Demand Indicator (nach DDD-Refactoring)" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
-          <mxGeometry x="250" y="15" width="600" height="30" as="geometry" />
+        <mxCell id="title" value="Domain Flow - User Story 5: Demand Indicator" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=18;fontStyle=1;fontColor=#1a237e;" vertex="1" parent="1">
+          <mxGeometry x="300" y="15" width="500" height="30" as="geometry" />
         </mxCell>
 
         <!-- ==================== EXTERNAL DATA ==================== -->
@@ -29,10 +29,6 @@
           <mxGeometry x="20" y="32" width="100" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="ui-get" value="demand_service.&#xa;get_latest_results()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=9;align=center;" vertex="1" parent="ui-layer">
-          <mxGeometry x="560" y="32" width="130" height="50" as="geometry" />
-        </mxCell>
-
         <mxCell id="ui-display" value="render_map_layer()&#xa;→ display_demand()&#xa;→ Folium Heatmap" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=9;align=center;" vertex="1" parent="ui-layer">
           <mxGeometry x="850" y="27" width="155" height="60" as="geometry" />
         </mxCell>
@@ -42,125 +38,155 @@
           <mxGeometry x="40" y="285" width="1020" height="95" as="geometry" />
         </mxCell>
 
-        <mxCell id="svc-calc" value="DemandService.calculate_demand&#xa;(df_stations_count, df_residents_geo)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="app-layer">
-          <mxGeometry x="180" y="32" width="220" height="50" as="geometry" />
+        <mxCell id="svc-calc" value="DemandService.calculate_demand()&#xa;Orchestrates demand calculation" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="app-layer">
+          <mxGeometry x="180" y="32" width="200" height="50" as="geometry" />
         </mxCell>
 
-        <mxCell id="svc-get" value="DemandService.get_latest_results()&#xa;→ returns DataFrame" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="app-layer">
+        <mxCell id="svc-get" value="DemandService.get_latest_results()&#xa;Returns cached DataFrame" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c8e6c9;strokeColor=#2e7d32;fontSize=9;align=center;" vertex="1" parent="app-layer">
           <mxGeometry x="560" y="32" width="180" height="50" as="geometry" />
         </mxCell>
 
         <!-- ==================== DOMAIN LAYER ==================== -->
-        <mxCell id="domain-layer" value="Domain Layer (src/demand/domain/)" style="swimlane;startSize=22;fillColor=#fff9c4;strokeColor=#f9a825;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="40" y="400" width="1020" height="120" as="geometry" />
+        <mxCell id="domain-layer" value="Domain Layer (src/demand/domain/events/)" style="swimlane;startSize=22;fillColor=#fff9c4;strokeColor=#f9a825;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="400" width="1020" height="95" as="geometry" />
         </mxCell>
 
-        <mxCell id="entity" value="&lt;&lt;Rich Entity&gt;&gt;&#xa;DemandResult&#xa;─────────────&#xa;+ get_demand_category()&#xa;+ is_high_demand()&#xa;+ get_priority_rank()" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dcedc8;strokeColor=#689f38;fontSize=9;align=center;" vertex="1" parent="domain-layer">
-          <mxGeometry x="20" y="25" width="140" height="90" as="geometry" />
+        <mxCell id="domain-calc" value="on_demand_calculated()&#xa;Calculates demand per PLZ:&#xa;demand = einwohner / count" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;align=center;" vertex="1" parent="domain-layer">
+          <mxGeometry x="180" y="25" width="200" height="60" as="geometry" />
         </mxCell>
 
-        <mxCell id="func-calc" value="on_demand_calculated&#xa;(df_stations_count, df_residents_geo)&#xa;────────────────────────────&#xa;1. Merge on PLZ&#xa;2. demand = residents / stations&#xa;   (or residents if stations=0)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1bee7;strokeColor=#7b1fa2;fontSize=9;align=center;" vertex="1" parent="domain-layer">
-          <mxGeometry x="180" y="25" width="230" height="90" as="geometry" />
-        </mxCell>
-
-        <mxCell id="event-class" value="&lt;&lt;Domain Event&gt;&gt;&#xa;DemandCalculatedEvent&#xa;─────────────&#xa;event_id, timestamp&#xa;total_areas, average_demand" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;align=center;" vertex="1" parent="domain-layer">
-          <mxGeometry x="430" y="25" width="160" height="90" as="geometry" />
-        </mxCell>
-
-        <mxCell id="func-display" value="display_demand(m, dframe_analysis)&#xa;────────────────────────────&#xa;1. vmax = 95th percentile&#xa;2. LinearColormap yellow → red&#xa;3. GeoJson per PLZ + tooltip" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffccbc;strokeColor=#e64a19;fontSize=9;align=center;" vertex="1" parent="domain-layer">
-          <mxGeometry x="760" y="25" width="220" height="90" as="geometry" />
+        <mxCell id="domain-display" value="display_demand()&#xa;Renders heatmap layer&#xa;on Folium map" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff9c4;strokeColor=#f9a825;fontSize=9;align=center;" vertex="1" parent="domain-layer">
+          <mxGeometry x="750" y="25" width="150" height="60" as="geometry" />
         </mxCell>
 
         <!-- ==================== INFRASTRUCTURE LAYER ==================== -->
-        <mxCell id="infra-layer" value="Infrastructure Layer (src/demand/infrastructure/)" style="swimlane;startSize=22;fillColor=#eceff1;strokeColor=#607d8b;fontStyle=1;fontSize=11;" vertex="1" parent="1">
-          <mxGeometry x="40" y="540" width="1020" height="85" as="geometry" />
+        <mxCell id="infra-layer" value="Infrastructure Layer (src/demand/infrastructure/repositories/)" style="swimlane;startSize=22;fillColor=#d1e7dd;strokeColor=#198754;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="40" y="515" width="1020" height="95" as="geometry" />
         </mxCell>
 
-        <mxCell id="repo" value="DemandRepository&#xa;(implements DemandRepositoryInterface)&#xa;get_analysis() | update_analysis(df)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#cfd8dc;strokeColor=#607d8b;fontSize=9;align=center;" vertex="1" parent="infra-layer">
-          <mxGeometry x="380" y="28" width="240" height="50" as="geometry" />
+        <mxCell id="repo-save" value="DemandRepository.save_analysis()&#xa;Caches DataFrame for later retrieval" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;fontSize=9;align=center;" vertex="1" parent="infra-layer">
+          <mxGeometry x="420" y="32" width="200" height="50" as="geometry" />
         </mxCell>
 
         <!-- ==================== ARROWS ==================== -->
-
-        <!-- External to Service (at startup via main.py) -->
-        <mxCell id="arr1" value="main.py startup" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;dashed=1;strokeColor=#c2185b;" edge="1" parent="1" source="ext-data" target="svc-calc">
+        <!-- External Data to Service (main.py startup) -->
+        <mxCell id="arr-startup" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;dashed=1;" edge="1" parent="1" source="ext-data" target="svc-calc">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="150" y="160" />
-              <mxPoint x="290" y="160" />
+              <mxPoint x="320" y="160" />
+              <mxPoint x="320" y="285" />
             </Array>
           </mxGeometry>
         </mxCell>
-
-        <!-- Service to Domain Function -->
-        <mxCell id="arr2" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;strokeColor=#7b1fa2;" edge="1" parent="1" source="svc-calc" target="func-calc">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="arr-startup-lbl" value="main.py startup" style="text;html=1;fontSize=9;fontColor=#666666;fontStyle=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="145" width="80" height="15" as="geometry" />
         </mxCell>
 
-        <!-- Domain Function produces Entity -->
-        <mxCell id="arr3" value="produces" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;dashed=1;strokeColor=#689f38;" edge="1" parent="1" source="func-calc" target="entity">
+        <!-- UI to Service -->
+        <mxCell id="arr1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" parent="1" source="ui-trigger" target="svc-calc">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="295" y="520" />
-              <mxPoint x="90" y="520" />
+              <mxPoint x="110" y="250" />
+              <mxPoint x="280" y="250" />
             </Array>
           </mxGeometry>
         </mxCell>
 
-        <!-- Domain Function raises Event -->
-        <mxCell id="arr3b" value="raises" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;dashed=1;strokeColor=#f9a825;" edge="1" parent="1" source="func-calc" target="event-class">
+        <!-- Service to Domain -->
+        <mxCell id="arr2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" parent="1" source="svc-calc" target="domain-calc">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 
-        <!-- Service to Repository -->
-        <mxCell id="arr4" value="update_analysis()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;strokeColor=#607d8b;" edge="1" parent="1" source="svc-calc" target="repo">
+        <!-- Domain to Repository -->
+        <mxCell id="arr3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" parent="1" source="domain-calc" target="repo-save">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="330" y="395" />
-              <mxPoint x="330" y="530" />
-              <mxPoint x="500" y="530" />
+              <mxPoint x="280" y="490" />
+              <mxPoint x="520" y="490" />
             </Array>
           </mxGeometry>
         </mxCell>
 
-        <!-- UI trigger to UI get -->
-        <mxCell id="arr5" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;strokeColor=#1976d2;" edge="1" parent="1" source="ui-trigger" target="ui-get">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- UI get to Service get -->
-        <mxCell id="arr6" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;strokeColor=#2e7d32;" edge="1" parent="1" source="ui-get" target="svc-get">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-
-        <!-- Service get to Repository -->
-        <mxCell id="arr7" value="get_analysis()" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;dashed=1;strokeColor=#607d8b;" edge="1" parent="1" source="svc-get" target="repo">
+        <!-- Repository to Service get (cached data) -->
+        <mxCell id="arr4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;dashed=1;" edge="1" parent="1" source="repo-save" target="svc-get">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
-              <mxPoint x="650" y="395" />
-              <mxPoint x="650" y="530" />
-              <mxPoint x="500" y="530" />
+              <mxPoint x="650" y="490" />
+              <mxPoint x="650" y="350" />
             </Array>
           </mxGeometry>
         </mxCell>
 
-        <!-- UI get to UI display -->
-        <mxCell id="arr8" value="data" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;dashed=1;strokeColor=#1976d2;" edge="1" parent="1" source="ui-get" target="ui-display">
-          <mxGeometry relative="1" as="geometry" />
+        <!-- Service to Display -->
+        <mxCell id="arr5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" parent="1" source="svc-get" target="domain-display">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="700" y="350" />
+              <mxPoint x="700" y="380" />
+              <mxPoint x="825" y="380" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
-        <!-- UI display to Domain display -->
-        <mxCell id="arr9" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;fontSize=8;strokeWidth=1;strokeColor=#e64a19;" edge="1" parent="1" source="ui-display" target="func-display">
-          <mxGeometry relative="1" as="geometry" />
+        <!-- Display to UI -->
+        <mxCell id="arr6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#666666;strokeWidth=2;endArrow=classic;endFill=1;" edge="1" parent="1" source="domain-display" target="ui-display">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="925" y="380" />
+              <mxPoint x="925" y="280" />
+            </Array>
+          </mxGeometry>
         </mxCell>
 
         <!-- ==================== LEGEND ==================== -->
-        <mxCell id="legend" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#666666;" vertex="1" parent="1">
-          <mxGeometry x="40" y="640" width="850" height="50" as="geometry" />
+        <mxCell id="legend" value="Legend" style="swimlane;startSize=20;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="630" width="700" height="90" as="geometry" />
         </mxCell>
 
-        <mxCell id="leg-txt" value="FLOW: main.py → DemandService.calculate_demand() → on_demand_calculated() → DemandResult (Rich Entity) → Repository  |  UI: get_latest_results() → display_demand() → Map" style="text;html=1;strokeColor=none;fillColor=none;align=center;fontSize=9;fontStyle=1;" vertex="1" parent="1">
-          <mxGeometry x="50" y="652" width="830" height="25" as="geometry" />
+        <!-- Layer Colors Row -->
+        <mxCell id="leg-layers-title" value="Layers:" style="text;fontSize=9;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="25" width="40" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-ext-txt" value="External Data" style="text;fontSize=9;fillColor=#fce4ec;strokeColor=#c2185b;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="55" y="25" width="78" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-pres-txt" value="Presentation" style="text;fontSize=9;fillColor=#e3f2fd;strokeColor=#1976d2;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="143" y="25" width="70" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-app-txt" value="Application" style="text;fontSize=9;fillColor=#e8f5e9;strokeColor=#4caf50;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="223" y="25" width="65" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-dom-txt" value="Domain" style="text;fontSize=9;fillColor=#fff9c4;strokeColor=#f9a825;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="298" y="25" width="50" height="18" as="geometry" />
+        </mxCell>
+        <mxCell id="leg-infra-txt" value="Infrastructure" style="text;fontSize=9;fillColor=#d1e7dd;strokeColor=#198754;rounded=1;spacingLeft=4;spacingRight=4;" vertex="1" parent="legend">
+          <mxGeometry x="358" y="25" width="75" height="18" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow Types Row -->
+        <mxCell id="leg-arrows-title" value="Arrows:" style="text;fontSize=9;fontStyle=1;" vertex="1" parent="legend">
+          <mxGeometry x="10" y="55" width="40" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-solid" value="" style="endArrow=classic;html=1;strokeColor=#666666;strokeWidth=2;" edge="1" parent="legend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="55" y="62" as="sourcePoint" />
+            <mxPoint x="95" y="62" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-solid-txt" value="Direct Call" style="text;fontSize=9;fontColor=#666666;" vertex="1" parent="legend">
+          <mxGeometry x="100" y="55" width="60" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg-dashed" value="" style="endArrow=classic;html=1;strokeColor=#666666;strokeWidth=2;dashed=1;" edge="1" parent="legend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="180" y="62" as="sourcePoint" />
+            <mxPoint x="220" y="62" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="leg-dashed-txt" value="Startup / Data Flow" style="text;fontSize=9;fontColor=#666666;" vertex="1" parent="legend">
+          <mxGeometry x="225" y="55" width="100" height="15" as="geometry" />
         </mxCell>
 
       </root>
