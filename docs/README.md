@@ -182,11 +182,3 @@ tests/
 
 ---
 
-## Document Files
-
-| File | Description |
-|------|-------------|
-| `README.md` | This file - Architecture overview |
-| `PR_WALKTHROUGH.md` | Detailed PR comparison (main vs TDD-leo) |
-| `TDD_REFACTORING_SUMMARY.md` | TDD methodology explanation |
-| `TDD_BRANCH_COMPARISON.md` | Branch comparison in German |
