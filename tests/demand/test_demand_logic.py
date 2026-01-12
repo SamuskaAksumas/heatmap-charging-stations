@@ -25,7 +25,7 @@ def test_demand_service_integration(demand_setup, people, stations, expected_dem
     
     df_stations = pd.DataFrame({
         'PLZ': ['12345'],
-        'count': [stations] # The service handles 'count' vs 'Number' internally
+        'Number': [stations]
     })
 
     df_residents = pd.DataFrame({
@@ -52,7 +52,7 @@ def test_demand_service_get_latest(demand_setup):
     service, repo = demand_setup
 
     # Create dummy data
-    df_stations = pd.DataFrame({'PLZ': ['10115'], 'count': [2]})
+    df_stations = pd.DataFrame({'PLZ': ['10115'], 'Number': [2]})
     df_residents = pd.DataFrame({'PLZ': ['10115'], 'Einwohner': [1000], 'geometry': [None]})
 
     # First, calculate it
@@ -77,7 +77,7 @@ class TestDemandEdgeCases:
 
         df_stations = pd.DataFrame({
             'PLZ': ['10115', '10117', '10119'],
-            'count': [5, 0, 10]
+            'Number': [5, 0, 10]
         })
         df_residents = pd.DataFrame({
             'PLZ': ['10115', '10117', '10119'],
@@ -99,7 +99,7 @@ class TestDemandEdgeCases:
         """Test with very high population and few stations."""
         service, repo = demand_setup
 
-        df_stations = pd.DataFrame({'PLZ': ['10115'], 'count': [1]})
+        df_stations = pd.DataFrame({'PLZ': ['10115'], 'Number': [1]})
         df_residents = pd.DataFrame({
             'PLZ': ['10115'],
             'Einwohner': [100000],
@@ -113,7 +113,7 @@ class TestDemandEdgeCases:
         """Test PLZ that exists only in residents data (no stations)."""
         service, repo = demand_setup
 
-        df_stations = pd.DataFrame({'PLZ': ['10115'], 'count': [5]})
+        df_stations = pd.DataFrame({'PLZ': ['10115'], 'Number': [5]})
         df_residents = pd.DataFrame({
             'PLZ': ['10115', '10117'],  # 10117 has no stations
             'Einwohner': [1000, 500],
@@ -144,7 +144,7 @@ class TestDemandErrorScenarios:
         """Test with empty input DataFrames."""
         service, repo = demand_setup
 
-        df_stations = pd.DataFrame({'PLZ': [], 'count': []})
+        df_stations = pd.DataFrame({'PLZ': [], 'Number': []})
         df_residents = pd.DataFrame({
             'PLZ': [],
             'Einwohner': [],

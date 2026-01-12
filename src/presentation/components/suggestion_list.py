@@ -2,6 +2,9 @@
 import streamlit as st
 from datetime import datetime
 
+from config import pdict
+from src.suggestion.domain.exceptions import InvalidSuggestionException
+
 
 def render_suggestion_list(suggestion_service):
     """Render community suggestions with optional admin controls."""
@@ -9,10 +12,10 @@ def render_suggestion_list(suggestion_service):
     suggestions = suggestion_service.get_all_suggestions()
     st.write("See suggestions from the community for new charging locations.")
 
-    # Admin password protection
+    # Admin password protection (from config)
     admin_password = st.text_input("Enter Admin Password to review", type="password")
 
-    if admin_password == "advanced":
+    if admin_password == pdict.get("admin_password", ""):
         admin_mode = True
         st.success("Admin mode unlocked")
     else:
@@ -76,17 +79,26 @@ def _render_admin_controls(suggestion, suggestion_service):
     col1, col2, col3 = st.columns(3)
     with col1:
         if st.button(f"Approve #{suggestion['id']}", key=f"approve_{suggestion['id']}"):
-            suggestion_service.review_suggestion(suggestion['id'], 'approved', 'Admin')
-            st.success("Suggestion approved!")
-            st.rerun()
+            try:
+                suggestion_service.review_suggestion(suggestion['id'], 'approved', 'Admin')
+                st.success("Suggestion approved!")
+                st.rerun()
+            except InvalidSuggestionException as e:
+                st.error(str(e))
     with col2:
         if st.button(f"Reject #{suggestion['id']}", key=f"reject_{suggestion['id']}"):
-            suggestion_service.review_suggestion(suggestion['id'], 'rejected', 'Admin')
-            st.success("Suggestion rejected!")
-            st.rerun()
+            try:
+                suggestion_service.review_suggestion(suggestion['id'], 'rejected', 'Admin')
+                st.success("Suggestion rejected!")
+                st.rerun()
+            except InvalidSuggestionException as e:
+                st.error(str(e))
     with col3:
         notes = st.text_input(f"Notes for #{suggestion['id']}", key=f"notes_{suggestion['id']}")
         if st.button(f"Add Notes #{suggestion['id']}", key=f"add_notes_{suggestion['id']}"):
-            suggestion_service.review_suggestion(suggestion['id'], suggestion.get('status', 'pending'), 'Admin', notes)
-            st.success("Notes added!")
-            st.rerun()
+            try:
+                suggestion_service.review_suggestion(suggestion['id'], suggestion.get('status', 'pending'), 'Admin', notes)
+                st.success("Notes added!")
+                st.rerun()
+            except InvalidSuggestionException as e:
+                st.error(str(e))

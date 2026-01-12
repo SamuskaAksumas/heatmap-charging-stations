@@ -46,12 +46,12 @@ class TestPostalCodeEdgeCases:
 
     def test_just_below_minimum_raises(self) -> None:
         """Test postal code just below Berlin range."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid Berlin postal code"):
             PostalCode("09999")
 
     def test_just_above_maximum_raises(self) -> None:
         """Test postal code just above Berlin range."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid Berlin postal code"):
             PostalCode("14201")
 
 
@@ -60,37 +60,37 @@ class TestPostalCodeErrorScenarios:
 
     def test_empty_string_raises(self) -> None:
         """Test that empty string raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="enter a postal code"):
             PostalCode("")
 
     def test_none_value_raises(self) -> None:
         """Test that None raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="enter a postal code"):
             PostalCode(None)  # type: ignore
 
     def test_non_numeric_raises(self) -> None:
         """Test that non-numeric string raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid 5-digit postal code"):
             PostalCode("abcde")
 
     def test_mixed_alphanumeric_raises(self) -> None:
         """Test that mixed alphanumeric raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid 5-digit postal code"):
             PostalCode("10a15")
 
     def test_too_short_raises(self) -> None:
         """Test that too short postal code raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid 5-digit postal code"):
             PostalCode("1011")
 
     def test_too_long_raises(self) -> None:
         """Test that too long postal code raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid 5-digit postal code"):
             PostalCode("101150")
 
     def test_whitespace_raises(self) -> None:
-        """Test that whitespace raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        """Test that whitespace-padded short code raises ValueError."""
+        with pytest.raises(ValueError, match="valid 5-digit postal code"):
             PostalCode("  101")
 
 
@@ -99,12 +99,12 @@ class TestPostalCodeDomainRules:
 
     def test_non_berlin_plz_munich_raises(self) -> None:
         """Test that Munich postal code raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid Berlin postal code"):
             PostalCode("80331")  # Munich
 
     def test_non_berlin_plz_hamburg_raises(self) -> None:
         """Test that Hamburg postal code raises ValueError."""
-        with pytest.raises(ValueError, match="Invalid postal code"):
+        with pytest.raises(ValueError, match="valid Berlin postal code"):
             PostalCode("20095")  # Hamburg
 
     def test_postal_code_is_immutable(self) -> None:

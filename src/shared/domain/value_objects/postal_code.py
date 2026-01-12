@@ -8,14 +8,24 @@ class PostalCode:
     value: str
 
     def __post_init__(self) -> None:
-        if not self._is_valid():
-            raise ValueError(f"Invalid postal code: {self.value}")
+        error = self._validate()
+        if error:
+            raise ValueError(error)
 
-    def _is_valid(self) -> bool:
-        """Check if PLZ is valid for Berlin (5 digits, 10000-14200)."""
-        if not self.value or len(self.value) != 5 or not self.value.isdigit():
-            return False
-        return 10000 <= int(self.value) <= 14200
+    def _validate(self) -> str | None:
+        """Validate PLZ and return error message if invalid, None if valid."""
+        if not self.value or not self.value.strip():
+            return "Please enter a postal code"
+
+        stripped = self.value.strip()
+        if not stripped.isdigit() or len(stripped) != 5:
+            return "Please enter a valid 5-digit postal code"
+
+        plz_int = int(stripped)
+        if not (10000 <= plz_int <= 14200):
+            return "Please enter a valid Berlin postal code (10000-14200)"
+
+        return None
 
     def __str__(self) -> str:
         return self.value

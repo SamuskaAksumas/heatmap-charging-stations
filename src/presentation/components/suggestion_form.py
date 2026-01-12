@@ -1,9 +1,11 @@
 """Suggestion form component - User submission of new locations."""
 import streamlit as st
 
+from src.suggestion.domain.exceptions import InvalidSuggestionException
+
 
 def render_suggestion_form(suggestion_service):
-    """Render suggestion submission form with PLZ validation."""
+    """Render suggestion submission form. Validation happens in Domain layer."""
     st.header("Suggest New Charging Location")
     st.write("Help improve Berlin's charging infrastructure by suggesting new locations where charging stations are needed.")
 
@@ -23,25 +25,14 @@ def render_suggestion_form(suggestion_service):
 
 
 def _handle_submission(plz, address, reason, suggestion_service):
-    """Handle form submission with validation."""
-    if not plz.strip():
-        st.error("Please enter a postal code")
-    elif not address.strip():
-        st.error("Please enter an address or location description")
-    elif not reason.strip():
-        st.error("Please explain why this location needs charging stations")
-    else:
-        try:
-            plz_int = int(plz.strip())
-            if 10000 <= plz_int <= 14200:
-                suggestion_service.create_suggestion(
-                    plz=plz.strip(),
-                    address=address.strip(),
-                    reason=reason.strip()
-                )
-                st.success("Thank you! Your suggestion has been submitted and will be reviewed.")
-                st.balloons()
-            else:
-                st.error("Please enter a valid Berlin postal code (10000-14200)")
-        except ValueError:
-            st.error("Please enter a valid 5-digit postal code")
+    """Handle form submission. Domain layer handles all validation."""
+    try:
+        suggestion_service.create_suggestion(
+            plz=plz.strip(),
+            address=address.strip(),
+            reason=reason.strip()
+        )
+        st.success("Thank you! Your suggestion has been submitted and will be reviewed.")
+        st.balloons()
+    except InvalidSuggestionException as e:
+        st.error(str(e))

@@ -42,22 +42,21 @@ class ChargingSuggestion:
         try:
             PostalCode(self.plz.strip() if self.plz else "")
         except ValueError as e:
-            raise InvalidSuggestionException(str(e), field="plz")
+            raise InvalidSuggestionException(str(e))
 
         # Validate address
         if not self.address or not self.address.strip():
-            raise InvalidSuggestionException("Address cannot be empty", field="address")
+            raise InvalidSuggestionException("Please enter an address or location description")
 
         # Validate reason
         if not self.reason or not self.reason.strip():
-            raise InvalidSuggestionException("Reason cannot be empty", field="reason")
+            raise InvalidSuggestionException("Please explain why this location needs charging stations")
 
         # Validate status
         valid_statuses = ['pending', 'approved', 'rejected', 'deleted']
         if self.status not in valid_statuses:
             raise InvalidSuggestionException(
-                f"Invalid status '{self.status}'. Must be one of: {valid_statuses}",
-                field="status"
+                f"Invalid status '{self.status}'. Must be one of: {valid_statuses}"
             )
 
     def is_pending(self) -> bool:
