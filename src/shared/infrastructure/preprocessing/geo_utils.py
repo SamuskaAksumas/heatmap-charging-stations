@@ -1,24 +1,10 @@
-"""
-Geographic utility functions for preprocessing.
-
-Contains functions for geometry handling and PLZ-based spatial operations.
-"""
+"""Geographic utilities for PLZ-based spatial operations."""
 import pandas as pd
 import geopandas as gpd
 
 
 def sort_by_plz_add_geometry(dfr, dfg, pdict):
-    """
-    Sort dataframe by PLZ and add geometry from geodata.
-
-    Args:
-        dfr: Input dataframe with PLZ column.
-        dfg: Geodata dataframe with PLZ and geometry columns.
-        pdict: Configuration dictionary with geocode key.
-
-    Returns:
-        GeoDataFrame sorted by PLZ with geometry column added.
-    """
+    """Sort by PLZ and merge with geodata geometry."""
     dframe = dfr.copy()
     df_geo = dfg.copy()
 
@@ -44,16 +30,7 @@ def sort_by_plz_add_geometry(dfr, dfg, pdict):
 
 
 def get_plz_centroid(plz, df_geo):
-    """
-    Get centroid coordinates for a PLZ.
-
-    Args:
-        plz: Postal code (string or int).
-        df_geo: Geodata dataframe with PLZ and geometry columns.
-
-    Returns:
-        Tuple of (latitude, longitude) or (None, None) if not found.
-    """
+    """Get centroid (lat, lon) for a PLZ from geodata."""
     try:
         plz_int = int(plz)
         geo_row = df_geo[df_geo['PLZ'] == plz_int]

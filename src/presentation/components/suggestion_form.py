@@ -1,16 +1,9 @@
-"""
-Suggestion form component for submitting new charging station suggestions.
-"""
+"""Suggestion form component - User submission of new locations."""
 import streamlit as st
 
 
 def render_suggestion_form(suggestion_service):
-    """
-    Render the suggestion submission form.
-
-    Args:
-        suggestion_service: Service for creating suggestions.
-    """
+    """Render suggestion submission form with PLZ validation."""
     st.header("Suggest New Charging Location")
     st.write("Help improve Berlin's charging infrastructure by suggesting new locations where charging stations are needed.")
 

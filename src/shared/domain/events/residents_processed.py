@@ -1,11 +1,11 @@
+"""Process resident data from various Excel/CSV formats."""
 import pandas as pd
 import geopandas as gpd
 import os
 
+
 def process_residents_data(path_residents, df_geodat_plz, datasets_dir):
-    """
-    Exact logic from the original main.py to handle T14 and T5 resident data formats.
-    """
+    """Parse T14/T5 resident data formats, attach PLZ geometry."""
     df_residents = None
     
     # 1. Attempt T14 Excel Logic

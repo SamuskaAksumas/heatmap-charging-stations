@@ -30,20 +30,16 @@ class TestSmokeImports:
     def test_demand_layer_imports(self) -> None:
         """Verifies that the demand bounded context can be imported."""
         from src.demand.application.services.demand_service import DemandService
-        from src.demand.domain.entities.demand_result import DemandResult
         from src.demand.domain.events.demand_calculated import on_demand_calculated
-        from src.demand.domain.exceptions import InvalidDemandDataException
-        from src.demand.domain.value_objects.demand_score import DemandScore
         from src.demand.infrastructure.repositories.demand_repository import DemandRepository
         assert DemandService is not None
-        assert DemandResult is not None
+        assert callable(on_demand_calculated)
 
     def test_suggestion_layer_imports(self) -> None:
         """Verifies that the suggestion bounded context can be imported."""
         from src.suggestion.application.services.suggestion_service import SuggestionService
         from src.suggestion.domain.entities.suggestion import ChargingSuggestion
         from src.suggestion.domain.exceptions import InvalidSuggestionException
-        from src.suggestion.domain.events import SuggestionCreatedEvent, SuggestionReviewedEvent
         from src.suggestion.infrastructure.repositories.suggestion_repository import SuggestionRepository
         assert SuggestionService is not None
         assert ChargingSuggestion is not None
@@ -51,13 +47,11 @@ class TestSmokeImports:
     def test_shared_layer_imports(self) -> None:
         """Verifies that the shared bounded context can be imported."""
         from src.shared.domain.value_objects.postal_code import PostalCode
-        from src.shared.domain.events.domain_event import DomainEvent
-        from src.shared.domain.exceptions import DomainException, InvalidPostalCodeException
-        from src.shared.domain.repositories.base_repository import BaseRepository
+        from src.shared.domain.exceptions import DomainException
         from src.shared.infrastructure.preprocessing import preprop_resid, preprop_lstat
         from src.shared.infrastructure.utils import timer
         assert PostalCode is not None
-        assert DomainEvent is not None
+        assert DomainException is not None
 
     def test_infrastructure_preprocessing_imports(self) -> None:
         """Verifies that preprocessing modules can be imported."""
@@ -83,37 +77,19 @@ class TestSmokeInstantiation:
         plz = PostalCode("10115")
         assert plz.value == "10115"
 
-    def test_demand_score_creation(self) -> None:
-        """Verifies that a DemandScore value object can be created."""
-        from src.demand.domain.value_objects.demand_score import DemandScore
-        score = DemandScore(500.0)
-        assert score.value == 500.0
-
-    def test_domain_event_creation(self) -> None:
-        """Verifies that domain events can be created."""
-        from src.shared.domain.events.domain_event import DomainEvent
-        event = DomainEvent()
-        assert event.event_id is not None
-        assert event.timestamp is not None
-
-    def test_suggestion_event_creation(self) -> None:
-        """Verifies that suggestion events can be created."""
-        from src.suggestion.domain.events import SuggestionCreatedEvent
-        event = SuggestionCreatedEvent(
-            suggestion_id=1,
-            plz="10115",
-            address="Test",
-            reason="Test"
-        )
-        assert event.suggestion_id == 1
-        assert event.event_type == "SuggestionCreatedEvent"
-
-    def test_demand_result_creation(self) -> None:
-        """Verifies that a DemandResult entity can be created."""
-        from src.demand.domain.entities.demand_result import DemandResult
-        result = DemandResult(plz="10115", demand=7500.0, einwohner=15000, count=2)
-        assert result.plz == "10115"
-        assert result.get_demand_category() == "medium"  # 5000 < 7500 <= 10000
+    def test_suggestion_creation(self) -> None:
+        """Verifies that a ChargingSuggestion entity can be created."""
+        from src.suggestion.domain.entities.suggestion import ChargingSuggestion
+        suggestion = ChargingSuggestion.from_dict({
+            'id': 1,
+            'plz': '10115',
+            'address': 'Test Address',
+            'reason': 'Test Reason',
+            'status': 'pending',
+            'created_at': '2024-01-01T00:00:00'
+        })
+        assert suggestion.plz == "10115"
+        assert suggestion.status == "pending"
 
 
 class TestSmokeExceptions:
@@ -125,9 +101,16 @@ class TestSmokeExceptions:
         with pytest.raises(ValueError):
             PostalCode("99999")
 
-    def test_invalid_demand_score_raises(self) -> None:
-        """Verifies that a negative DemandScore throws an error."""
-        from src.demand.domain.value_objects.demand_score import DemandScore
-        from src.demand.domain.exceptions import InvalidDemandDataException
-        with pytest.raises(InvalidDemandDataException):
-            DemandScore(-100.0)
+    def test_invalid_suggestion_plz_raises(self) -> None:
+        """Verifies that an invalid PLZ in suggestion throws an error."""
+        from src.suggestion.domain.entities.suggestion import ChargingSuggestion
+        from src.suggestion.domain.exceptions import InvalidSuggestionException
+        with pytest.raises(InvalidSuggestionException):
+            ChargingSuggestion.from_dict({
+                'id': 1,
+                'plz': '99999',  # Invalid - not a Berlin PLZ
+                'address': 'Test',
+                'reason': 'Test',
+                'status': 'pending',
+                'created_at': '2024-01-01T00:00:00'
+            })

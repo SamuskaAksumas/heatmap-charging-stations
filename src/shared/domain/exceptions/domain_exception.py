@@ -1,21 +1,8 @@
-"""
-Base domain exception class.
-
-All domain-specific exceptions should inherit from this class
-to allow for centralized exception handling.
-"""
+"""DomainException - Base class for all domain-level errors."""
 
 
 class DomainException(Exception):
-    """
-    Base exception for all domain-level errors.
-
-    Provides a common parent class for domain exceptions,
-    enabling catch-all handling of domain errors.
-
-    Attributes:
-        message: Human-readable error description.
-    """
+    """Base exception for domain errors. All domain exceptions inherit from this."""
 
     def __init__(self, message: str):
         self.message = message

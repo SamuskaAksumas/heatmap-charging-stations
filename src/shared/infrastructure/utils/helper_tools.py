@@ -1,22 +1,10 @@
-"""
-Helper utilities for the application.
-
-Contains timing decorators and other utility functions.
-"""
+"""Helper utilities - timing decorator and other tools."""
 import time
 import functools
 
 
 def timer(func):
-    """
-    Decorator that prints the runtime of the decorated function.
-
-    Args:
-        func: The function to be timed.
-
-    Returns:
-        Wrapper function that times execution and prints duration.
-    """
+    """Decorator that prints function runtime."""
     @functools.wraps(func)
     def wrapper_timer(*args, **kwargs):
         start_time = time.perf_counter()

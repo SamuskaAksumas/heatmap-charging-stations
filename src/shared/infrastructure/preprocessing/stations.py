@@ -1,8 +1,4 @@
-"""
-Preprocessing functions for charging station data.
-
-Contains functions for processing the Ladesaeulenregister.csv data.
-"""
+"""Preprocessing for charging station data (Ladesaeulenregister.csv)."""
 import pandas as pd
 from src.shared.infrastructure.utils import timer
 from .geo_utils import sort_by_plz_add_geometry
@@ -10,7 +6,7 @@ from .geo_utils import sort_by_plz_add_geometry
 
 @timer
 def preprop_lstat(dfr, dfg, pdict):
-    """Preprocessing dataframe from Ladesaeulenregister.csv"""
+    """Preprocess station data: filter Berlin, add geometry."""
     dframe = dfr.copy()
     df_geo = dfg.copy()
 
@@ -31,15 +27,7 @@ def preprop_lstat(dfr, dfg, pdict):
 
 
 def count_plz_occurrences(df_lstat2):
-    """
-    Counts loading stations per PLZ.
-
-    Args:
-        df_lstat2: Preprocessed station dataframe with PLZ and geometry.
-
-    Returns:
-        DataFrame with PLZ, Number (count), and geometry columns.
-    """
+    """Count charging stations per PLZ, keep geometry."""
     # Group by PLZ and count occurrences, keeping geometry
     result_df = df_lstat2.groupby('PLZ').agg(
         Number=('PLZ', 'count'),

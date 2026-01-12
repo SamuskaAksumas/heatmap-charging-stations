@@ -1,50 +1,27 @@
-"""
-Entity: ChargingSuggestion
-
-Rich domain entity representing a user suggestion for a new charging station location.
-Contains validation and business logic following DDD principles.
-"""
+"""ChargingSuggestion Entity - Rich domain model with State Machine."""
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
 from src.suggestion.domain.exceptions import InvalidSuggestionException
+from src.shared.domain.value_objects.postal_code import PostalCode
 
 
-# Valid status transitions
 VALID_STATUS_TRANSITIONS = {
     'pending': ['approved', 'rejected', 'deleted'],
     'approved': ['deleted'],
     'rejected': ['deleted'],
-    'deleted': [],  # Terminal state
+    'deleted': [],
 }
 
 
 @dataclass
 class ChargingSuggestion:
     """
-    Rich Entity representing a charging station location suggestion.
+    Suggestion for a new charging station location.
 
-    This entity includes validation and business logic, following DDD principles
-    where entities are not just data containers but encapsulate domain rules.
-
-    Attributes:
-        plz: Postal code (PLZ) for the suggested location (Berlin range)
-        address: Street address for the suggestion (non-empty)
-        reason: User's reason for suggesting this location (non-empty)
-        id: Unique identifier (assigned by domain event)
-        timestamp: Creation timestamp (ISO format)
-        status: Current status ('pending', 'approved', 'rejected', 'deleted')
-
-    Domain Rules:
-        - PLZ must be a valid Berlin postal code (10000-14200)
-        - Address and reason cannot be empty
-        - Status can only transition through valid paths
-        - New suggestions always start as 'pending'
-
-    Example:
-        >>> suggestion = ChargingSuggestion("10115", "Torstrasse 1", "High foot traffic")
-        >>> suggestion.approve("Admin")
+    State Machine: pending → approved/rejected → deleted
+    Validates PLZ via PostalCode Value Object.
     """
     plz: str
     address: str
@@ -57,32 +34,15 @@ class ChargingSuggestion:
     review_notes: Optional[str] = None
 
     def __post_init__(self) -> None:
-        """Validate the suggestion upon creation."""
         self._validate()
 
     def _validate(self) -> None:
-        """
-        Validate all fields according to domain rules.
-
-        Raises:
-            InvalidSuggestionException: If any validation fails.
-        """
-        # Validate PLZ
-        if not self.plz or not self.plz.strip():
-            raise InvalidSuggestionException("PLZ cannot be empty", field="plz")
-
+        """Validate all fields according to domain rules."""
+        # Validate PLZ using PostalCode Value Object
         try:
-            plz_int = int(self.plz.strip())
-            if not (10000 <= plz_int <= 14200):
-                raise InvalidSuggestionException(
-                    f"PLZ must be in Berlin range (10000-14200), got {plz_int}",
-                    field="plz"
-                )
-        except ValueError:
-            raise InvalidSuggestionException(
-                f"PLZ must be numeric, got '{self.plz}'",
-                field="plz"
-            )
+            PostalCode(self.plz.strip() if self.plz else "")
+        except ValueError as e:
+            raise InvalidSuggestionException(str(e), field="plz")
 
         # Validate address
         if not self.address or not self.address.strip():
@@ -101,45 +61,23 @@ class ChargingSuggestion:
             )
 
     def is_pending(self) -> bool:
-        """Check if the suggestion is pending review."""
         return self.status == 'pending'
 
     def is_approved(self) -> bool:
-        """Check if the suggestion has been approved."""
         return self.status == 'approved'
 
     def is_rejected(self) -> bool:
-        """Check if the suggestion has been rejected."""
         return self.status == 'rejected'
 
     def is_deleted(self) -> bool:
-        """Check if the suggestion has been deleted."""
         return self.status == 'deleted'
 
     def can_transition_to(self, new_status: str) -> bool:
-        """
-        Check if a status transition is valid.
-
-        Args:
-            new_status: The target status.
-
-        Returns:
-            True if the transition is allowed.
-        """
+        """Check if status transition is valid per State Machine rules."""
         return new_status in VALID_STATUS_TRANSITIONS.get(self.status, [])
 
     def _transition_status(self, new_status: str, reviewer: str, notes: str = None) -> None:
-        """
-        Internal method to transition status with validation.
-
-        Args:
-            new_status: The target status.
-            reviewer: Name of the reviewer.
-            notes: Optional review notes.
-
-        Raises:
-            InvalidSuggestionException: If the transition is not allowed.
-        """
+        """Execute status transition with validation."""
         if not self.can_transition_to(new_status):
             raise InvalidSuggestionException(
                 f"Cannot transition from '{self.status}' to '{new_status}'"
@@ -152,51 +90,19 @@ class ChargingSuggestion:
             self.review_notes = notes
 
     def approve(self, reviewer: str, notes: str = None) -> None:
-        """
-        Approve this suggestion.
-
-        Args:
-            reviewer: Name of the admin approving.
-            notes: Optional approval notes.
-
-        Raises:
-            InvalidSuggestionException: If suggestion cannot be approved.
-        """
+        """Approve this suggestion (pending → approved)."""
         self._transition_status('approved', reviewer, notes)
 
     def reject(self, reviewer: str, notes: str = None) -> None:
-        """
-        Reject this suggestion.
-
-        Args:
-            reviewer: Name of the admin rejecting.
-            notes: Optional rejection notes.
-
-        Raises:
-            InvalidSuggestionException: If suggestion cannot be rejected.
-        """
+        """Reject this suggestion (pending → rejected)."""
         self._transition_status('rejected', reviewer, notes)
 
     def delete(self, reviewer: str = None, notes: str = None) -> None:
-        """
-        Mark this suggestion as deleted.
-
-        Args:
-            reviewer: Name of the admin deleting (optional).
-            notes: Optional deletion notes.
-
-        Raises:
-            InvalidSuggestionException: If suggestion cannot be deleted.
-        """
+        """Mark as deleted (terminal state)."""
         self._transition_status('deleted', reviewer or 'System', notes)
 
     def to_dict(self) -> dict:
-        """
-        Convert entity to dictionary for persistence.
-
-        Returns:
-            Dictionary representation of the suggestion.
-        """
+        """Convert to dictionary for persistence."""
         return {
             'id': self.id,
             'plz': self.plz,
@@ -211,15 +117,7 @@ class ChargingSuggestion:
 
     @classmethod
     def from_dict(cls, data: dict) -> "ChargingSuggestion":
-        """
-        Create entity from dictionary.
-
-        Args:
-            data: Dictionary with suggestion data.
-
-        Returns:
-            ChargingSuggestion instance.
-        """
+        """Create entity from dictionary (e.g., from JSON storage)."""
         return cls(
             plz=data.get('plz', ''),
             address=data.get('address', ''),

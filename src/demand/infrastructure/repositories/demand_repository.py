@@ -1,38 +1,18 @@
-"""
-Repository: DemandRepository
-
-Infrastructure layer component for persisting demand analysis data.
-"""
+"""DemandRepository - In-memory cache for demand analysis results."""
 from typing import Optional
 import pandas as pd
 
 
 class DemandRepository:
-    """
-    Repository for storing and retrieving demand analysis results.
-
-    Uses in-memory storage for simplicity. Can be extended to use
-    SQLite or other persistence mechanisms.
-    """
+    """Repository for caching demand analysis DataFrames."""
 
     def __init__(self) -> None:
-        """Initialize the repository with empty storage."""
         self._current_analysis: Optional[pd.DataFrame] = None
 
     def get_analysis(self) -> Optional[pd.DataFrame]:
-        """
-        Retrieve the current demand analysis results.
-
-        Returns:
-            DataFrame with demand results, or None if no data stored
-        """
+        """Retrieve cached analysis results."""
         return self._current_analysis
 
     def update_analysis(self, df: pd.DataFrame) -> None:
-        """
-        Store new demand analysis results.
-
-        Args:
-            df: DataFrame containing demand analysis data
-        """
+        """Store analysis results."""
         self._current_analysis = df

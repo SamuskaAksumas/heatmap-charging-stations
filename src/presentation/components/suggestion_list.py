@@ -1,17 +1,10 @@
-"""
-Suggestion list component for viewing and managing suggestions.
-"""
+"""Suggestion list component - View and admin management of suggestions."""
 import streamlit as st
 from datetime import datetime
 
 
 def render_suggestion_list(suggestion_service):
-    """
-    Render the list of community suggestions.
-
-    Args:
-        suggestion_service: Service for retrieving and reviewing suggestions.
-    """
+    """Render community suggestions with optional admin controls."""
     st.header("Community Suggestions")
     suggestions = suggestion_service.get_all_suggestions()
     st.write("See suggestions from the community for new charging locations.")

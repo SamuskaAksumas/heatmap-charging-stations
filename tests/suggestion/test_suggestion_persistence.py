@@ -1,6 +1,7 @@
 import pytest
 from src.suggestion.application.services.suggestion_service import SuggestionService
 from src.suggestion.infrastructure.repositories.in_memory_suggestion_repository import InMemorySuggestionRepository
+from src.suggestion.domain.exceptions import InvalidSuggestionException
 
 @pytest.fixture
 def suggestion_setup():
@@ -22,7 +23,7 @@ def test_create_suggestion_integration(suggestion_setup):
 
     # 3. ASSERT - Verify via Repository
     # Instead of checking a JSON file, we check the In-Memory storage
-    all_suggestions = repo.fetch_raw_data()
+    all_suggestions = repo.get_all_including_deleted()
     
     assert len(all_suggestions) == 1
     assert all_suggestions[0]['plz'] == "10117"
@@ -35,14 +36,14 @@ def test_review_suggestion_logic(suggestion_setup):
     # 1. ARRANGE
     service, repo = suggestion_setup
     service.create_suggestion("10115", "Mitte", "Need power")
-    suggestion_id = repo.fetch_raw_data()[0]['id']
+    suggestion_id = repo.get_all_including_deleted()[0]['id']
 
     # 2. ACT
     # Test the admin review functionality
     service.review_suggestion(suggestion_id, status="approved", reviewer="Admin", notes="Valid point")
 
     # 3. ASSERT
-    updated_suggestion = repo.fetch_raw_data()[0]
+    updated_suggestion = repo.get_all_including_deleted()[0]
     assert updated_suggestion['status'] == "approved"
     assert updated_suggestion['reviewed_by'] == "Admin"
     assert updated_suggestion['review_notes'] == "Valid point"
@@ -61,7 +62,7 @@ class TestSuggestionEdgeCases:
         service.create_suggestion("10117", "Address 2", "Reason 2")
         service.create_suggestion("10119", "Address 3", "Reason 3")
 
-        all_suggestions = repo.fetch_raw_data()
+        all_suggestions = repo.get_all_including_deleted()
         assert len(all_suggestions) == 3
         assert all_suggestions[0]['id'] == 1
         assert all_suggestions[1]['id'] == 2
@@ -72,11 +73,11 @@ class TestSuggestionEdgeCases:
         service, repo = suggestion_setup
 
         service.create_suggestion("10115", "Bad Location", "Not good")
-        suggestion_id = repo.fetch_raw_data()[0]['id']
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
 
         service.review_suggestion(suggestion_id, status="rejected", reviewer="Admin", notes="Invalid location")
 
-        updated = repo.fetch_raw_data()[0]
+        updated = repo.get_all_including_deleted()[0]
         assert updated['status'] == "rejected"
         assert updated['review_notes'] == "Invalid location"
 
@@ -88,9 +89,9 @@ class TestSuggestionEdgeCases:
         service.create_suggestion("10117", "Address 2", "Reason 2")
 
         # Manually mark one as deleted
-        all_data = repo.fetch_raw_data()
+        all_data = repo.get_all_including_deleted()
         all_data[0]['status'] = 'deleted'
-        repo.save(all_data)
+        repo.update(all_data)
 
         # get_all_suggestions should filter deleted
         visible = service.get_all_suggestions()
@@ -118,7 +119,7 @@ class TestSuggestionErrorScenarios:
         service.review_suggestion(999, status="approved", reviewer="Admin", notes="Test")
 
         # Should not crash, just do nothing
-        all_suggestions = repo.fetch_raw_data()
+        all_suggestions = repo.get_all_including_deleted()
         assert len(all_suggestions) == 0
 
 
@@ -133,7 +134,7 @@ class TestSuggestionDomainRules:
 
         service.create_suggestion("10115", "Test Address", "Test Reason")
 
-        suggestion = repo.fetch_raw_data()[0]
+        suggestion = repo.get_all_including_deleted()[0]
         assert suggestion['status'] == "pending"
 
     def test_suggestion_gets_timestamp(self, suggestion_setup):
@@ -142,7 +143,7 @@ class TestSuggestionDomainRules:
 
         service.create_suggestion("10115", "Test Address", "Test Reason")
 
-        suggestion = repo.fetch_raw_data()[0]
+        suggestion = repo.get_all_including_deleted()[0]
         assert 'timestamp' in suggestion
         assert suggestion['timestamp'] is not None
 
@@ -153,6 +154,71 @@ class TestSuggestionDomainRules:
         service.create_suggestion("10115", "Address 1", "Reason 1")
         service.create_suggestion("10117", "Address 2", "Reason 2")
 
-        suggestions = repo.fetch_raw_data()
+        suggestions = repo.get_all_including_deleted()
         assert suggestions[0]['id'] == 1
         assert suggestions[1]['id'] == 2
+
+
+# ==================== STATE MACHINE TESTS ====================
+
+class TestSuggestionStateMachine:
+    """State Machine tests - valid status transitions."""
+
+    def test_cannot_approve_already_approved(self, suggestion_setup):
+        """Test that approving an already approved suggestion raises error."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Test", "Reason")
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
+
+        # First approval works
+        service.review_suggestion(suggestion_id, status="approved", reviewer="Admin")
+
+        # Second approval should fail
+        with pytest.raises(InvalidSuggestionException):
+            service.review_suggestion(suggestion_id, status="approved", reviewer="Admin2")
+
+    def test_cannot_reject_already_approved(self, suggestion_setup):
+        """Test that rejecting an approved suggestion raises error."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Test", "Reason")
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
+
+        service.review_suggestion(suggestion_id, status="approved", reviewer="Admin")
+
+        # Cannot go from approved to rejected
+        with pytest.raises(InvalidSuggestionException):
+            service.review_suggestion(suggestion_id, status="rejected", reviewer="Admin")
+
+    def test_can_delete_approved_suggestion(self, suggestion_setup):
+        """Test that deleting an approved suggestion works."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Test", "Reason")
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
+
+        service.review_suggestion(suggestion_id, status="approved", reviewer="Admin")
+        service.review_suggestion(suggestion_id, status="deleted", reviewer="Admin")
+
+        updated = repo.get_all_including_deleted()[0]
+        assert updated['status'] == "deleted"
+
+    def test_valid_transitions_from_pending(self, suggestion_setup):
+        """Test all valid transitions from pending status."""
+        service, repo = suggestion_setup
+
+        # Test pending -> approved
+        service.create_suggestion("10115", "Test1", "Reason1")
+        service.review_suggestion(1, status="approved", reviewer="Admin")
+        assert repo.get_all_including_deleted()[0]['status'] == "approved"
+
+        # Test pending -> rejected
+        service.create_suggestion("10117", "Test2", "Reason2")
+        service.review_suggestion(2, status="rejected", reviewer="Admin")
+        assert repo.get_all_including_deleted()[1]['status'] == "rejected"
+
+        # Test pending -> deleted
+        service.create_suggestion("10119", "Test3", "Reason3")
+        service.review_suggestion(3, status="deleted", reviewer="Admin")
+        assert repo.get_all_including_deleted()[2]['status'] == "deleted"

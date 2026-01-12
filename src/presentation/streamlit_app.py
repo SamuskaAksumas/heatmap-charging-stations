@@ -1,9 +1,4 @@
-"""
-Main Streamlit application for the Electric Charging Stations Heatmap.
-
-This is the UI Presentation Layer that displays the interactive map
-based on pre-calculated demand and station data.
-"""
+"""Streamlit app - Main UI for Electric Charging Stations Heatmap."""
 import folium
 import streamlit as st
 from streamlit_folium import folium_static
@@ -18,15 +13,7 @@ from .components.suggestion_list import render_suggestion_list
 
 @timer
 def make_streamlit_electric_charging_resid(dfr1, dfr2, demand_service):
-    """
-    UI Presentation Layer:
-    Displays the interactive map based on pre-calculated demand and station data.
-
-    Args:
-        dfr1: DataFrame with station counts per PLZ.
-        dfr2: DataFrame with resident and demand data per PLZ.
-        demand_service: Service for retrieving demand calculation results.
-    """
+    """Display interactive map with stations, residents, and demand layers."""
     suggestion_repo = SuggestionRepository()
     suggestion_service = SuggestionService(suggestion_repo)
 

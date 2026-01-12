@@ -1,15 +1,11 @@
-"""
-Preprocessing functions for resident data.
-
-Contains functions for processing the plz_einwohner data.
-"""
+"""Preprocessing for resident data (plz_einwohner.csv)."""
 from src.shared.infrastructure.utils import timer
 from .geo_utils import sort_by_plz_add_geometry
 
 
 @timer
 def preprop_resid(dfr, dfg, pdict):
-    """Preprocessing dataframe from plz_einwohner.csv"""
+    """Preprocess resident data: filter Berlin PLZ, add geometry."""
     dframe = dfr.copy()
     df_geo = dfg.copy()
 

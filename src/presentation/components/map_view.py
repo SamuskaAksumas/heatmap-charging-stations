@@ -1,23 +1,10 @@
-"""
-Map view component for rendering geographic data layers.
-
-Contains functions for rendering Residents, Charging Stations, and Demand layers.
-"""
+"""Map view component - Renders geographic data layers on Folium map."""
 import folium
 from branca.colormap import LinearColormap
 
 
 def render_map_layer(m, layer_selection, dframe_stations, dframe_analysis, demand_service):
-    """
-    Render the selected map layer.
-
-    Args:
-        m: Folium map object.
-        layer_selection: Selected layer name ('Residents', 'Charging_Stations', 'Demand').
-        dframe_stations: DataFrame with station counts per PLZ.
-        dframe_analysis: DataFrame with resident and demand data per PLZ.
-        demand_service: Service for retrieving demand data.
-    """
+    """Render selected layer (Residents/Charging_Stations/Demand)."""
     from src.demand.domain.events.display_demand import display_demand
     import streamlit as st
 

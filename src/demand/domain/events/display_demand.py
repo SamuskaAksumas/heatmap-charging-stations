@@ -1,12 +1,11 @@
-# src/demand/presentation/display_demand.py
+"""Render demand heatmap on Folium map."""
 import folium
 import numpy as np
 from branca.colormap import LinearColormap
 
+
 def display_demand(m, dframe_analysis):
-    """
-    Presentation Layer: Renders only the Demand Heatmap on a provided Folium map.
-    """
+    """Render demand heatmap layer with color gradient (yellow→red)."""
     # Logic moved from methods.py
     # Calculate vmax based on 95th percentile to handle outliers
     demand_values = dframe_analysis['demand'].replace(0, np.nan).dropna()
