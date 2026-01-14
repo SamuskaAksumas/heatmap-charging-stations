@@ -255,7 +255,7 @@
         <mxCell id="v2" value="2" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="170" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="vm2" value="get_all_suggestions()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+        <mxCell id="vm2" value="get_suggestions_for_users() [User] / get_all_suggestions() [Admin]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
           <mxGeometry width="80" relative="1" as="geometry">
             <mxPoint x="230" y="180" as="sourcePoint" />
             <mxPoint x="395" y="180" as="targetPoint" />
@@ -265,7 +265,7 @@
         <mxCell id="v3" value="3" style="ellipse;whiteSpace=wrap;html=1;fillColor=#1976d2;strokeColor=#1976d2;fontColor=#ffffff;fontSize=10;fontStyle=1;" vertex="1" parent="1">
           <mxGeometry x="40" y="200" width="20" height="20" as="geometry" />
         </mxCell>
-        <mxCell id="vm3" value="get_all()" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
+        <mxCell id="vm3" value="get_visible_for_users() [User] / get_all() [Admin]" style="html=1;verticalAlign=bottom;endArrow=block;curved=0;rounded=0;fontSize=9;" edge="1" parent="1">
           <mxGeometry width="80" relative="1" as="geometry">
             <mxPoint x="405" y="210" as="sourcePoint" />
             <mxPoint x="605" y="210" as="targetPoint" />
@@ -273,7 +273,7 @@
         </mxCell>
 
         <!-- Repository note -->
-        <mxCell id="note2" value="get_all() internally:&#xa;1. Reads JSON file&#xa;2. Filters status != 'deleted'" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#d1e7dd;strokeColor=#198754;fontSize=8;align=left;spacingLeft=5;" vertex="1" parent="1">
+        <mxCell id="note2" value="User: pending + approved only&#xa;Admin: all except deleted" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;fillColor=#d1e7dd;strokeColor=#198754;fontSize=8;align=left;spacingLeft=5;" vertex="1" parent="1">
           <mxGeometry x="630" y="220" width="140" height="50" as="geometry" />
         </mxCell>
 

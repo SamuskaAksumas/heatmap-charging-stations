@@ -10,8 +10,12 @@ class InMemorySuggestionRepository:
         self._data: List[Dict[str, Any]] = []
 
     def get_all(self) -> List[Dict[str, Any]]:
-        """Get all visible suggestions (excludes deleted)."""
+        """Get all visible suggestions (excludes deleted) - for admin view."""
         return [s for s in self._data if s.get('status') != 'deleted']
+
+    def get_visible_for_users(self) -> List[Dict[str, Any]]:
+        """Get suggestions visible to users (pending + approved only)."""
+        return [s for s in self._data if s.get('status') in ['pending', 'approved']]
 
     def get_all_including_deleted(self) -> List[Dict[str, Any]]:
         """Get all suggestions including deleted."""

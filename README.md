@@ -124,11 +124,19 @@ For detailed architecture diagrams, see `docs/`.
   - Methods: `approve()`, `reject()`, `delete()`, `can_transition_to()`
   - Validates PLZ using shared `PostalCode` value object
 - **Exception**: `InvalidSuggestionException` - For validation and transition errors
-- **Service**: `SuggestionService` - Thin orchestrator for CRUD operations
+- **Service**: `SuggestionService` - Thin orchestrator for CRUD operations:
+  - `get_suggestions_for_users()` - Returns pending + approved only (user view)
+  - `get_all_suggestions()` - Returns all except deleted (admin view)
+  - `review_suggestion()` - Approve, reject, or delete suggestions
 - **Repository**: `SuggestionRepository` - JSON file persistence with:
   - `add()` - Assigns ID, timestamp, status='pending'
-  - `get_all()` - Returns visible suggestions (filters deleted)
+  - `get_visible_for_users()` - Returns pending + approved (user view)
+  - `get_all()` - Returns all except deleted (admin view)
   - `update()` - Saves changes after review
+
+**User vs Admin Views:**
+- **Users**: See only `pending` and `approved` suggestions (rejected hidden)
+- **Admins**: See all suggestions (pending, approved, rejected) + can delete any
 
 ### 4. Testing (`tests/`)
 - **TDD approach**: Red-Green-Refactor cycle

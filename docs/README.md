@@ -118,10 +118,18 @@ Manages user suggestions for new charging locations:
 - **Exception**: `InvalidSuggestionException` - For validation errors
 - **Repository**: `SuggestionRepository` - Handles persistence:
   - `add()` - Assigns ID, timestamp, status='pending'
-  - `get_all()` - Returns visible suggestions (filters deleted)
-  - `get_all_including_deleted()` - For admin review
+  - `get_visible_for_users()` - Returns pending + approved only (user view)
+  - `get_all()` - Returns all except deleted (admin view)
+  - `get_all_including_deleted()` - For review operations
   - `update()` - Saves changes after review
-- **Service**: `SuggestionService` - Thin orchestrator between Entity and Repository
+- **Service**: `SuggestionService` - Thin orchestrator between Entity and Repository:
+  - `get_suggestions_for_users()` - User view (pending + approved)
+  - `get_all_suggestions()` - Admin view (all except deleted)
+  - `review_suggestion()` - Approve, reject, or delete
+
+**User vs Admin Views:**
+- **Users**: See only pending and approved suggestions (rejected hidden from public view)
+- **Admins**: See all suggestions + can approve, reject, or delete any suggestion
 
 ---
 

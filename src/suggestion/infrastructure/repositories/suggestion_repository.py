@@ -13,8 +13,12 @@ class SuggestionRepository:
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
 
     def get_all(self) -> list:
-        """Get all visible suggestions (excludes deleted)."""
+        """Get all visible suggestions (excludes deleted) - for admin view."""
         return [s for s in self._fetch_raw_data() if s.get('status') != 'deleted']
+
+    def get_visible_for_users(self) -> list:
+        """Get suggestions visible to users (pending + approved only)."""
+        return [s for s in self._fetch_raw_data() if s.get('status') in ['pending', 'approved']]
 
     def get_all_including_deleted(self) -> list:
         """Get all suggestions including deleted (for admin/review)."""

@@ -9,7 +9,6 @@ from src.suggestion.domain.exceptions import InvalidSuggestionException
 def render_suggestion_list(suggestion_service):
     """Render community suggestions with optional admin controls."""
     st.header("Community Suggestions")
-    suggestions = suggestion_service.get_all_suggestions()
     st.write("See suggestions from the community for new charging locations.")
 
     # Admin password protection (from config)
@@ -18,9 +17,13 @@ def render_suggestion_list(suggestion_service):
     if admin_password == pdict.get("admin_password", ""):
         admin_mode = True
         st.success("Admin mode unlocked")
+        # Admin sees all suggestions (except deleted)
+        suggestions = suggestion_service.get_all_suggestions()
     else:
         admin_mode = False
         st.info("Enter the correct admin password to unlock review features.")
+        # Users see only pending + approved
+        suggestions = suggestion_service.get_suggestions_for_users()
 
     if not suggestions:
         st.info("No suggestions yet. Be the first to suggest a new charging location!")
@@ -67,38 +70,57 @@ def _render_single_suggestion(suggestion, admin_mode, suggestion_service):
         if suggestion.get('review_notes'):
             st.caption(f"Notes: {suggestion['review_notes']}")
 
-    # Admin review buttons
-    if admin_mode and status == 'pending':
-        _render_admin_controls(suggestion, suggestion_service)
+    # Admin controls
+    if admin_mode:
+        _render_admin_controls(suggestion, suggestion_service, status)
 
     st.divider()
 
 
-def _render_admin_controls(suggestion, suggestion_service):
+def _render_admin_controls(suggestion, suggestion_service, status):
     """Render admin review controls for a suggestion."""
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        if st.button(f"Approve #{suggestion['id']}", key=f"approve_{suggestion['id']}"):
+    suggestion_id = suggestion['id']
+
+    # Notes input field for admin
+    notes = st.text_input(
+        "Review notes (optional)",
+        key=f"notes_{suggestion_id}",
+        placeholder="Add notes for this review..."
+    )
+
+    # Approve/Reject only for pending
+    if status == 'pending':
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button(f"Approve #{suggestion_id}", key=f"approve_{suggestion_id}"):
+                try:
+                    suggestion_service.review_suggestion(suggestion_id, 'approved', 'Admin', notes)
+                    st.success("Suggestion approved!")
+                    st.rerun()
+                except InvalidSuggestionException as e:
+                    st.error(str(e))
+        with col2:
+            if st.button(f"Reject #{suggestion_id}", key=f"reject_{suggestion_id}"):
+                try:
+                    suggestion_service.review_suggestion(suggestion_id, 'rejected', 'Admin', notes)
+                    st.success("Suggestion rejected!")
+                    st.rerun()
+                except InvalidSuggestionException as e:
+                    st.error(str(e))
+        with col3:
+            if st.button(f"Delete #{suggestion_id}", key=f"delete_{suggestion_id}", type="secondary"):
+                try:
+                    suggestion_service.review_suggestion(suggestion_id, 'deleted', 'Admin', notes)
+                    st.success("Suggestion deleted!")
+                    st.rerun()
+                except InvalidSuggestionException as e:
+                    st.error(str(e))
+    else:
+        # For approved/rejected: only delete button
+        if st.button(f"Delete #{suggestion_id}", key=f"delete_{suggestion_id}", type="secondary"):
             try:
-                suggestion_service.review_suggestion(suggestion['id'], 'approved', 'Admin')
-                st.success("Suggestion approved!")
-                st.rerun()
-            except InvalidSuggestionException as e:
-                st.error(str(e))
-    with col2:
-        if st.button(f"Reject #{suggestion['id']}", key=f"reject_{suggestion['id']}"):
-            try:
-                suggestion_service.review_suggestion(suggestion['id'], 'rejected', 'Admin')
-                st.success("Suggestion rejected!")
-                st.rerun()
-            except InvalidSuggestionException as e:
-                st.error(str(e))
-    with col3:
-        notes = st.text_input(f"Notes for #{suggestion['id']}", key=f"notes_{suggestion['id']}")
-        if st.button(f"Add Notes #{suggestion['id']}", key=f"add_notes_{suggestion['id']}"):
-            try:
-                suggestion_service.review_suggestion(suggestion['id'], suggestion.get('status', 'pending'), 'Admin', notes)
-                st.success("Notes added!")
+                suggestion_service.review_suggestion(suggestion_id, 'deleted', 'Admin', notes)
+                st.success("Suggestion deleted!")
                 st.rerun()
             except InvalidSuggestionException as e:
                 st.error(str(e))

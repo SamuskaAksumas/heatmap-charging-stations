@@ -56,7 +56,7 @@
           <mxGeometry x="340" y="220" width="130" height="35" as="geometry" />
         </mxCell>
 
-        <mxCell id="u-show-status" value="Show:&#xa;Pending / Approved / Rejected" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="user-flow">
+        <mxCell id="u-show-status" value="Show:&#xa;Pending / Approved&#xa;(Rejected hidden)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=9;" vertex="1" parent="user-flow">
           <mxGeometry x="340" y="280" width="130" height="45" as="geometry" />
         </mxCell>
 
@@ -156,6 +156,11 @@
 
         <!-- Add notes -->
         <mxCell id="a-notes" value="Add notes" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=10;" vertex="1" parent="admin-flow">
+          <mxGeometry x="220" y="290" width="80" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Set deleted -->
+        <mxCell id="a-delete" value="Set: deleted" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="admin-flow">
           <mxGeometry x="220" y="340" width="80" height="30" as="geometry" />
         </mxCell>
 
@@ -209,7 +214,14 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="aa8-lbl" value="Notes" style="text;fontSize=8;fontColor=#666666;" vertex="1" parent="admin-flow">
-          <mxGeometry x="220" y="305" width="35" height="15" as="geometry" />
+          <mxGeometry x="200" y="265" width="35" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="aa12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-action" target="a-delete">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa12-lbl" value="Delete" style="text;fontSize=8;fontColor=#b85450;" vertex="1" parent="admin-flow">
+          <mxGeometry x="220" y="315" width="35" height="15" as="geometry" />
         </mxCell>
 
         <mxCell id="aa9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-approve" target="a-save">
@@ -219,6 +231,9 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="aa11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-notes" target="a-save">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="aa13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#666666;endArrow=classic;" edge="1" parent="admin-flow" source="a-delete" target="a-save">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
 

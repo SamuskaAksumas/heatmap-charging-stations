@@ -222,3 +222,113 @@ class TestSuggestionStateMachine:
         service.create_suggestion("10119", "Test3", "Reason3")
         service.review_suggestion(3, status="deleted", reviewer="Admin")
         assert repo.get_all_including_deleted()[2]['status'] == "deleted"
+
+
+# ==================== USER VISIBILITY TESTS ====================
+
+class TestUserVisibility:
+    """Tests for user-visible suggestions (pending + approved only)."""
+
+    def test_get_suggestions_for_users_excludes_rejected(self, suggestion_setup):
+        """Test that get_suggestions_for_users filters out rejected suggestions."""
+        service, repo = suggestion_setup
+
+        # Create suggestions with different statuses
+        service.create_suggestion("10115", "Pending Address", "Reason 1")
+        service.create_suggestion("10117", "Approved Address", "Reason 2")
+        service.create_suggestion("10119", "Rejected Address", "Reason 3")
+
+        # Approve the second
+        service.review_suggestion(2, status="approved", reviewer="Admin")
+        # Reject the third
+        service.review_suggestion(3, status="rejected", reviewer="Admin")
+
+        # get_suggestions_for_users should only return pending + approved
+        user_visible = service.get_suggestions_for_users()
+
+        assert len(user_visible) == 2
+        statuses = [s['status'] for s in user_visible]
+        assert 'pending' in statuses
+        assert 'approved' in statuses
+        assert 'rejected' not in statuses
+
+    def test_get_suggestions_for_users_excludes_deleted(self, suggestion_setup):
+        """Test that get_suggestions_for_users also filters out deleted suggestions."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Address 1", "Reason 1")
+        service.create_suggestion("10117", "Address 2", "Reason 2")
+
+        # Delete the first one
+        service.review_suggestion(1, status="deleted", reviewer="Admin")
+
+        user_visible = service.get_suggestions_for_users()
+
+        assert len(user_visible) == 1
+        assert user_visible[0]['plz'] == "10117"
+
+    def test_admin_sees_all_including_rejected(self, suggestion_setup):
+        """Test that get_all_suggestions (admin view) includes rejected."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Address 1", "Reason 1")
+        service.create_suggestion("10117", "Address 2", "Reason 2")
+
+        # Reject the second
+        service.review_suggestion(2, status="rejected", reviewer="Admin")
+
+        # Admin view (get_all_suggestions) should include rejected
+        admin_visible = service.get_all_suggestions()
+
+        assert len(admin_visible) == 2
+        statuses = [s['status'] for s in admin_visible]
+        assert 'rejected' in statuses
+
+
+# ==================== DELETE FUNCTIONALITY TESTS ====================
+
+class TestDeleteFunctionality:
+    """Tests for admin delete functionality."""
+
+    def test_delete_pending_suggestion(self, suggestion_setup):
+        """Test deleting a pending suggestion."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Test", "Reason")
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
+
+        service.review_suggestion(suggestion_id, status="deleted", reviewer="Admin")
+
+        # Should be deleted
+        updated = repo.get_all_including_deleted()[0]
+        assert updated['status'] == "deleted"
+        assert updated['reviewed_by'] == "Admin"
+
+    def test_delete_rejected_suggestion(self, suggestion_setup):
+        """Test deleting a rejected suggestion."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Test", "Reason")
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
+
+        # First reject
+        service.review_suggestion(suggestion_id, status="rejected", reviewer="Admin")
+        # Then delete
+        service.review_suggestion(suggestion_id, status="deleted", reviewer="Admin")
+
+        updated = repo.get_all_including_deleted()[0]
+        assert updated['status'] == "deleted"
+
+    def test_cannot_delete_already_deleted(self, suggestion_setup):
+        """Test that deleting an already deleted suggestion raises error."""
+        service, repo = suggestion_setup
+
+        service.create_suggestion("10115", "Test", "Reason")
+        suggestion_id = repo.get_all_including_deleted()[0]['id']
+
+        # First delete works
+        service.review_suggestion(suggestion_id, status="deleted", reviewer="Admin")
+
+        # Second delete should fail
+        with pytest.raises(InvalidSuggestionException):
+            service.review_suggestion(suggestion_id, status="deleted", reviewer="Admin")

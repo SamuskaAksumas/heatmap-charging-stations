@@ -12,8 +12,12 @@ class SuggestionService:
         self._repository = repository
 
     def get_all_suggestions(self) -> List[Dict[str, Any]]:
-        """Retrieve all visible suggestions (excludes deleted)."""
+        """Retrieve all visible suggestions (excludes deleted) - for admin view."""
         return self._repository.get_all()
+
+    def get_suggestions_for_users(self) -> List[Dict[str, Any]]:
+        """Retrieve suggestions visible to users (pending + approved only)."""
+        return self._repository.get_visible_for_users()
 
     def create_suggestion(self, plz: str, address: str, reason: str) -> Dict[str, Any]:
         """Create a new suggestion (validates via Entity, persists via Repository)."""

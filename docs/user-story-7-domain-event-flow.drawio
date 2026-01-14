@@ -72,12 +72,12 @@
           <mxGeometry x="40" y="520" width="1300" height="100" as="geometry" />
         </mxCell>
 
-        <mxCell id="repo" value="SuggestionRepository&#xa;JSON file: data/suggestions.json" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;fontSize=9;align=center;" vertex="1" parent="infra-layer">
-          <mxGeometry x="400" y="35" width="200" height="50" as="geometry" />
+        <mxCell id="repo" value="SuggestionRepository&#xa;JSON file: data/suggestions.json&#xa;────────────────&#xa;get_visible_for_users() → pending + approved&#xa;get_all() → all except deleted (admin)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;fontSize=9;align=center;" vertex="1" parent="infra-layer">
+          <mxGeometry x="350" y="30" width="280" height="60" as="geometry" />
         </mxCell>
 
         <mxCell id="repo-inmem" value="InMemorySuggestionRepository&#xa;For testing (no file I/O)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d1e7dd;strokeColor=#198754;fontSize=9;align=center;" vertex="1" parent="infra-layer">
-          <mxGeometry x="650" y="35" width="200" height="50" as="geometry" />
+          <mxGeometry x="680" y="35" width="200" height="50" as="geometry" />
         </mxCell>
 
         <!-- ==================== ARROWS ==================== -->
