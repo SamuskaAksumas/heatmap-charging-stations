@@ -92,7 +92,7 @@ def _render_admin_controls(suggestion, suggestion_service, status):
     if status == 'pending':
         col1, col2, col3 = st.columns(3)
         with col1:
-            if st.button(f"Approve #{suggestion_id}", key=f"approve_{suggestion_id}"):
+            if st.button("✓ Approve", key=f"approve_{suggestion_id}"):
                 try:
                     suggestion_service.review_suggestion(suggestion_id, 'approved', 'Admin', notes)
                     st.success("Suggestion approved!")
@@ -100,7 +100,7 @@ def _render_admin_controls(suggestion, suggestion_service, status):
                 except InvalidSuggestionException as e:
                     st.error(str(e))
         with col2:
-            if st.button(f"Reject #{suggestion_id}", key=f"reject_{suggestion_id}"):
+            if st.button("✗ Reject", key=f"reject_{suggestion_id}"):
                 try:
                     suggestion_service.review_suggestion(suggestion_id, 'rejected', 'Admin', notes)
                     st.success("Suggestion rejected!")
@@ -108,7 +108,7 @@ def _render_admin_controls(suggestion, suggestion_service, status):
                 except InvalidSuggestionException as e:
                     st.error(str(e))
         with col3:
-            if st.button(f"Delete #{suggestion_id}", key=f"delete_{suggestion_id}", type="secondary"):
+            if st.button("🗑 Delete", key=f"delete_{suggestion_id}"):
                 try:
                     suggestion_service.review_suggestion(suggestion_id, 'deleted', 'Admin', notes)
                     st.success("Suggestion deleted!")
@@ -117,7 +117,7 @@ def _render_admin_controls(suggestion, suggestion_service, status):
                     st.error(str(e))
     else:
         # For approved/rejected: only delete button
-        if st.button(f"Delete #{suggestion_id}", key=f"delete_{suggestion_id}", type="secondary"):
+        if st.button("🗑 Delete", key=f"delete_{suggestion_id}"):
             try:
                 suggestion_service.review_suggestion(suggestion_id, 'deleted', 'Admin', notes)
                 st.success("Suggestion deleted!")
