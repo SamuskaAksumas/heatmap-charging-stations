@@ -1,6 +1,7 @@
 """Suggestion list component - View and admin management of suggestions."""
-import streamlit as st
 from datetime import datetime
+
+import streamlit as st
 
 from config import pdict
 from src.suggestion.domain.exceptions import InvalidSuggestionException

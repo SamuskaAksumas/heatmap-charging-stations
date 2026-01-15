@@ -1,5 +1,4 @@
 """Geographic utilities for PLZ-based spatial operations."""
-import pandas as pd
 import geopandas as gpd
 
 

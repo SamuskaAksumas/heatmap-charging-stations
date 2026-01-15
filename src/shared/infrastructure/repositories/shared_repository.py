@@ -1,6 +1,7 @@
 """SharedRepository - File I/O for shared data sources."""
-import pandas as pd
 import os
+
+import pandas as pd
 
 
 class SharedRepository:
