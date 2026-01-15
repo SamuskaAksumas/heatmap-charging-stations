@@ -15,5 +15,10 @@ p["file_geodat_dis"]       = "geodata_berlin_dis.csv"
 # p["gebaeude_filter"]        = ["Freistehendes Einzelgebäude", "Doppelhaushälfte"]
 
 # -----------------------------------
+# Admin settings
+# NOTE: In production, use environment variables or .streamlit/secrets.toml
+p["admin_password"]         = "advanced"
+
+# -----------------------------------
 pdict = p.copy()
 

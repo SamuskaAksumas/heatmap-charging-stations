@@ -1,13 +1,14 @@
-import pandas as pd
-import geopandas as gpd
+"""Process resident data from various Excel/CSV formats."""
 import os
 
+import pandas as pd
+import geopandas as gpd
+
+
 def process_residents_data(path_residents, df_geodat_plz, datasets_dir):
-    """
-    Exact logic from the original main.py to handle T14 and T5 resident data formats.
-    """
+    """Parse T14/T5 resident data formats, attach PLZ geometry."""
     df_residents = None
-    
+
     # 1. Attempt T14 Excel Logic
     if path_residents.lower().endswith(('.xlsx', '.xls')):
         try:
@@ -36,7 +37,7 @@ def process_residents_data(path_residents, df_geodat_plz, datasets_dir):
                 df_res['plz'] = df_res['plz'].astype(str).str.extract(r'(\d{5})')[0]
                 df_res['plz'] = pd.to_numeric(df_res['plz'], errors='coerce')
                 df_res['einwohner'] = pd.to_numeric(df_res['einwohner'], errors='coerce').fillna(0).astype(int)
-                
+
                 # Attach PLZ centroid
                 df_geodat_plz_loc = df_geodat_plz.copy()
                 df_geodat_plz_loc['geometry'] = gpd.GeoSeries.from_wkt(df_geodat_plz_loc['geometry'])

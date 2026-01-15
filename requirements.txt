@@ -16,3 +16,5 @@ folium
 branca
 openpyxl
 pytest
+pytest-cov
+pylint
