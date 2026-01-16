@@ -1,6 +1,7 @@
 # Architecture Documentation
 
-This folder contains architecture documentation for the Berlin Electric Charging Stations Heatmap project.
+This folder contains architecture documentation for the "ChargeHub Berlin" project.
+Streamlit APP: https://heatmap-charging-stations-57gjuxh3nzacjdg3tdojua.streamlit.app/
 
 ## Current Architecture
 

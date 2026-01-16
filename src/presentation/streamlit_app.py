@@ -21,7 +21,7 @@ def make_streamlit_electric_charging_resid(dfr1, dfr2, demand_service):
     dframe_stations = dfr1.copy()
     dframe_analysis = dfr2.copy()
 
-    st.title('Heatmaps: Charging Stations, Residents and Demand')
+    st.title("ChargeHub Berlin")
 
     # Add tabs for different functionalities
     tab1, tab2, tab3 = st.tabs(["Map View", "Suggest Location", "View Suggestions"])
