@@ -1,7 +1,6 @@
-# Berlin Geo Heatmap
+# ChargeHub Berlin
 
 **Project Introduction**
-- **Name**: BerlinHub Charging Stations
 - **Purpose**: Visualize the heatmap for the amount of electric charging stations and residents. With this information a 3rd heatmap is being generated to show the demand defined by residents/charging station. Additionally, users can suggest new charging station locations via a suggestion form and view previously proposed stations.
 - **Application-Link**: https://heatmap-charging-stations-57gjuxh3nzacjdg3tdojua.streamlit.app/ 
 
