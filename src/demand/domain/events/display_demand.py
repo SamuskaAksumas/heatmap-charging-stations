@@ -16,7 +16,7 @@ def display_demand(m, dframe_analysis):
 
     color_map = LinearColormap(colors=['yellow', 'red'], vmin=0, vmax=vmax)
 
-    for idx, row in dframe_analysis.iterrows():
+    for _, row in dframe_analysis.iterrows():
         val = float(row['demand'])
         display_val = min(val, vmax) # Cap visual color for better heatmap contrast
 

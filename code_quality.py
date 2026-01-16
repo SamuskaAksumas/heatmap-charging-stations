@@ -6,7 +6,10 @@ import re
 
 def run_command(cmd: list[str]) -> str:
     """Run command and return output."""
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd="/workspace/work")
+    import os
+    env = os.environ.copy()
+    env["PYTHONPATH"] = "/workspace/work"
+    result = subprocess.run(cmd, capture_output=True, text=True, cwd="/workspace/work", env=env)
     return result.stdout + result.stderr
 
 

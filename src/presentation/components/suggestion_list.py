@@ -62,12 +62,13 @@ def _render_single_suggestion(suggestion, admin_mode, suggestion_service):
         try:
             dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
             st.caption(f"Suggested on {dt.strftime('%Y-%m-%d %H:%M')}")
-        except:
+        except ValueError:
             st.caption(f"Suggested: {timestamp}")
 
     # Show review info if available
     if suggestion.get('reviewed_by'):
-        st.caption(f"Reviewed by {suggestion['reviewed_by']} on {suggestion.get('review_date', '')[:10]}")
+        review_date = suggestion.get('review_date', '')[:10]
+        st.caption(f"Reviewed by {suggestion['reviewed_by']} on {review_date}")
         if suggestion.get('review_notes'):
             st.caption(f"Notes: {suggestion['review_notes']}")
 

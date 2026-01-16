@@ -17,10 +17,10 @@ class InMemorySharedRepository:
         """Set fake geodata for testing."""
         self._fake_geodata = df
 
-    def read_csv_with_header_detection(self, path, sep=';'):
+    def read_csv_with_header_detection(self, _path, _sep=';'):
         """Return pre-loaded fake CSV."""
         return self._fake_csv_data
 
-    def load_geodata(self, path):
+    def load_geodata(self, _path):
         """Return pre-loaded fake geodata."""
         return self._fake_geodata

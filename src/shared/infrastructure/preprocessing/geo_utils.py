@@ -37,6 +37,6 @@ def get_plz_centroid(plz, df_geo):
             geom = geo_row.iloc[0]['geometry']
             if hasattr(geom, 'centroid'):
                 return geom.centroid.y, geom.centroid.x
-    except:
+    except Exception:
         pass
     return None, None
