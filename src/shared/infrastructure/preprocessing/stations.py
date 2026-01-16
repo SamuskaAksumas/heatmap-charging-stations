@@ -29,7 +29,10 @@ def preprop_lstat(dfr, dfg, pdict):
         (dframe2["Bundesland"] == 'Berlin') &
         (dframe2["PLZ"] > 10115) &
         (dframe2["PLZ"] < 14200)
-    ]
+    ].copy()
+
+    # Convert PLZ to integer (no NaN after filtering)
+    dframe3['PLZ'] = dframe3['PLZ'].astype(int)
 
     ret = sort_by_plz_add_geometry(dframe3, df_geo, pdict)
     return ret

@@ -22,7 +22,11 @@ def preprop_resid(dfr, dfg, pdict):
 
     dframe3 = dframe2[
         (dframe2["PLZ"] > 10000) &
-        (dframe2["PLZ"] < 14200)]
+        (dframe2["PLZ"] < 14200)
+    ].copy()
+
+    # Convert PLZ to integer (no NaN after filtering)
+    dframe3['PLZ'] = dframe3['PLZ'].astype(int)
 
     ret = sort_by_plz_add_geometry(dframe3, df_geo, pdict)
 
