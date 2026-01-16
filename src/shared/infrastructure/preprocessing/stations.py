@@ -10,8 +10,13 @@ def preprop_lstat(dfr, dfg, pdict):
     dframe = dfr.copy()
     df_geo = dfg.copy()
 
-    dframe2 = dframe.loc[:, ['Postleitzahl', 'Bundesland', 'Breitengrad', 'Längengrad', 'Nennleistung Ladeeinrichtung [kW]']]
-    dframe2.rename(columns={"Nennleistung Ladeeinrichtung [kW]": "KW", "Postleitzahl": "PLZ"}, inplace=True)
+    cols = ['Postleitzahl', 'Bundesland', 'Breitengrad', 'Längengrad',
+            'Nennleistung Ladeeinrichtung [kW]']
+    dframe2 = dframe.loc[:, cols]
+    dframe2.rename(
+        columns={"Nennleistung Ladeeinrichtung [kW]": "KW", "Postleitzahl": "PLZ"},
+        inplace=True
+    )
 
     # Normalize PLZ to numeric to ensure consistent joins with geodata
     dframe2['PLZ'] = pd.to_numeric(dframe2['PLZ'], errors='coerce')
@@ -20,7 +25,11 @@ def preprop_lstat(dfr, dfg, pdict):
     dframe2['Breitengrad'] = dframe2['Breitengrad'].astype(str).str.replace(',', '.')
     dframe2['Längengrad'] = dframe2['Längengrad'].astype(str).str.replace(',', '.')
 
-    dframe3 = dframe2[(dframe2["Bundesland"] == 'Berlin') & (dframe2["PLZ"] > 10115) & (dframe2["PLZ"] < 14200)]
+    dframe3 = dframe2[
+        (dframe2["Bundesland"] == 'Berlin') &
+        (dframe2["PLZ"] > 10115) &
+        (dframe2["PLZ"] < 14200)
+    ]
 
     ret = sort_by_plz_add_geometry(dframe3, df_geo, pdict)
     return ret
