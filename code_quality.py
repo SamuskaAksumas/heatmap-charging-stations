@@ -6,7 +6,7 @@ import re
 
 def run_command(cmd: list[str]) -> str:
     """Run command and return output."""
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd="/workspace/work")
+    result = subprocess.run(cmd, capture_output=True, text=True)#, cwd="/workspace/work")
     return result.stdout + result.stderr
 
 
@@ -35,19 +35,23 @@ def get_test_coverage() -> dict:
     }
 
     for line in output.split("\n"):
-        match = re.match(r"(src/\S+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
+        # UPDATED REGEX: Uses search (not match) and accepts \ or / separators
+        match = re.search(r"(src[\\/].+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
         if match:
             filepath, stmts, miss, pct = match.groups()
             stmts, miss = int(stmts), int(miss)
             covered = stmts - miss
 
-            if "/domain/" in filepath:
+            # NORMALIZE PATH: Convert backslashes to forward slashes and lowercase for safe checking
+            clean_path = filepath.replace("\\", "/").lower()
+
+            if "/domain/" in clean_path:
                 layer = "Domain"
-            elif "/application/" in filepath:
+            elif "/application/" in clean_path:
                 layer = "Application"
-            elif "/infrastructure/" in filepath:
+            elif "/infrastructure/" in clean_path:
                 layer = "Infrastructure"
-            elif "/presentation/" in filepath:
+            elif "/presentation/" in clean_path:
                 layer = "Presentation"
             else:
                 continue
