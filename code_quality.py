@@ -198,17 +198,7 @@ def print_dashboard():
     if domain_ok and app_ok:
         print("Business logic is well tested - Presentation/Infrastructure")
         print("have lower coverage which is acceptable for a DDD demo.")
-    print()# 1. Tell git you fixed the file
-git add code_quality.py
-
-# 2. Commit the changes
-git commit -m "Resolved conflict: Updated dashboard for full Windows compatibility"
-
-# 3. Push to GitHub
-git push
-
-# 4. Cleanup: Remove the stash entry (since we manually fixed it)
-git stash drop
+    print()
 
 
 if __name__ == "__main__":
