@@ -2,11 +2,16 @@
 import subprocess
 import sys
 import re
-
+import os
 
 def run_command(cmd: list[str]) -> str:
     """Run command and return output."""
-    result = subprocess.run(cmd, capture_output=True, text=True)#, cwd="/workspace/work")
+    # FIX 1: Set PYTHONPATH dynamically for Windows/Linux compatibility
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.getcwd()  # Adds current folder to path so 'src' is found
+    
+    # Run command without hardcoded 'cwd'
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
     return result.stdout + result.stderr
 
 
@@ -35,15 +40,16 @@ def get_test_coverage() -> dict:
     }
 
     for line in output.split("\n"):
-        # UPDATED REGEX: Uses search (not match) and accepts \ or / separators
-        match = re.search(r"(src[\\/].+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
+        # FIX 2: Updated Regex to accept Windows backslashes [\\/]
+        # Uses re.search to be more robust against leading whitespace
+        match = re.search(r"(src[\\/]\S+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
         if match:
             filepath, stmts, miss, pct = match.groups()
             stmts, miss = int(stmts), int(miss)
             covered = stmts - miss
 
-            # NORMALIZE PATH: Convert backslashes to forward slashes and lowercase for safe checking
-            clean_path = filepath.replace("\\", "/").lower()
+            # FIX 3: Normalize path to forward slashes for the checks below
+            clean_path = filepath.replace("\\", "/")
 
             if "/domain/" in clean_path:
                 layer = "Domain"
@@ -113,10 +119,14 @@ def count_lines() -> dict:
 
     for pattern in ["src/**/*.py", "tests/**/*.py"]:
         for filepath in glob.glob(pattern, recursive=True):
-            with open(filepath, "r") as f:
-                lines = len([l for l in f.readlines() if l.strip() and not l.strip().startswith("#")])
-                total_lines += lines
-                total_files += 1
+            try:
+                # Added encoding check for safer reading on Windows
+                with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                    lines = len([l for l in f.readlines() if l.strip() and not l.strip().startswith("#")])
+                    total_lines += lines
+                    total_files += 1
+            except Exception:
+                continue
 
     return {"files": total_files, "lines": total_lines}
 
@@ -188,7 +198,17 @@ def print_dashboard():
     if domain_ok and app_ok:
         print("Business logic is well tested - Presentation/Infrastructure")
         print("have lower coverage which is acceptable for a DDD demo.")
-    print()
+    print()# 1. Tell git you fixed the file
+git add code_quality.py
+
+# 2. Commit the changes
+git commit -m "Resolved conflict: Updated dashboard for full Windows compatibility"
+
+# 3. Push to GitHub
+git push
+
+# 4. Cleanup: Remove the stash entry (since we manually fixed it)
+git stash drop
 
 
 if __name__ == "__main__":
