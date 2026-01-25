@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.shared.domain.aggregate_root import AggregateRoot
+from src.shared.domain.aggregates.aggregate_root import AggregateRoot
 from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
 from src.suggestion.domain.exceptions.invalid_suggestion_exception import (
     InvalidSuggestionException,

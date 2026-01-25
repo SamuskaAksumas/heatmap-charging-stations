@@ -1,6 +1,6 @@
 from abc import ABC
 from typing import List
-from src.shared.domain.entity import Entity
+from src.shared.domain.entities.entity import Entity
 
 
 class AggregateRoot(Entity, ABC):

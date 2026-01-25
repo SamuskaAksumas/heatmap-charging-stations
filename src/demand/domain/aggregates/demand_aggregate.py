@@ -1,7 +1,7 @@
 from typing import List
 import pandas as pd
 
-from src.shared.domain.aggregate_root import AggregateRoot
+from src.shared.domain.aggregates.aggregate_root import AggregateRoot
 from src.demand.domain.entities.demand_entity import DemandEntity
 from src.demand.domain.value_objects.demand_score import DemandScore
 from src.demand.domain.value_objects.plz import PLZ

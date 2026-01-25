@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Optional
 
-from src.shared.domain.entity import Entity
+from src.shared.domain.entities.entity import Entity
 from src.shared.domain.value_objects.postal_code import PostalCode
 from src.suggestion.domain.exceptions.invalid_suggestion_exception import (
     InvalidSuggestionException,

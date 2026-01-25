@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.shared.domain.entity import Entity
+from src.shared.domain.entities.entity import Entity
 from src.demand.domain.value_objects.plz import PLZ
 from src.demand.domain.value_objects.demand_score import DemandScore
 
