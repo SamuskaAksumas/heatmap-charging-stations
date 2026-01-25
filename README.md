@@ -53,6 +53,8 @@ For detailed architecture diagrams, see `docs/`.
 │   │
 │   ├── shared/                          # Shared Bounded Context
 │   │   ├── domain/
+│   │   │   ├── aggregates/              # SharedAggregate (Calculates density)
+│   │   │   ├── entities/                # SharedEntity
 │   │   │   ├── value_objects/           # PostalCode (validates Berlin PLZ)
 │   │   │   ├── events/                  # Data processing functions
 │   │   │   └── exceptions/              # DomainException
