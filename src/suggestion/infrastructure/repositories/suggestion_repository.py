@@ -1,57 +1,69 @@
-"""SuggestionRepository - JSON file persistence for suggestions."""
 import json
 import os
-from datetime import datetime
-
+from typing import List, Optional
+from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
+from src.suggestion.domain.aggregates.suggestion_aggregate import SuggestionAggregate
 
 class SuggestionRepository:
-    """Repository for suggestions using JSON file storage."""
-
-    def __init__(self):
-        base_path = os.path.dirname(os.path.dirname(__file__))
-        self.file_path = os.path.join(base_path, "data", "suggestions.json")
+    def __init__(self, file_path: str = "src/suggestion/infrastructure/data/suggestions.json"):
+        self.file_path = file_path
+        # Ensure the directory exists so open() doesn't fail
         os.makedirs(os.path.dirname(self.file_path), exist_ok=True)
 
-    def get_all(self) -> list:
-        """Get all visible suggestions (excludes deleted) - for admin view."""
-        return [s for s in self._fetch_raw_data() if s.get('status') != 'deleted']
-
-    def get_visible_for_users(self) -> list:
-        """Get suggestions visible to users (pending + approved only)."""
-        return [s for s in self._fetch_raw_data() if s.get('status') in ['pending', 'approved']]
-
-    def get_all_including_deleted(self) -> list:
-        """Get all suggestions including deleted (for admin/review)."""
-        return self._fetch_raw_data()
-
-    def add(self, suggestion_dict: dict) -> dict:
-        """Add new suggestion with ID, timestamp, and initial status."""
-        suggestions = self._fetch_raw_data()
-
-        # Assign persistence metadata
-        suggestion_dict['id'] = len(suggestions) + 1
-        suggestion_dict['timestamp'] = datetime.now().isoformat()
-        suggestion_dict['status'] = 'pending'
-        suggestion_dict['reviewed_by'] = None
-        suggestion_dict['review_date'] = None
-        suggestion_dict['review_notes'] = None
-
-        suggestions.append(suggestion_dict)
-        self._save(suggestions)
-        return suggestion_dict
-
-    def update(self, suggestions_list: list):
-        """Overwrite all suggestions (after review updates)."""
-        self._save(suggestions_list)
-
-    def _fetch_raw_data(self) -> list:
-        """Internal: Read all suggestions from file."""
-        if os.path.exists(self.file_path):
+    def _load_json(self) -> List[dict]:
+        """Private helper to read the JSON file safely."""
+        if not os.path.exists(self.file_path):
+            return []
+        try:
             with open(self.file_path, 'r', encoding='utf-8') as f:
                 return json.load(f)
-        return []
+        except (json.JSONDecodeError, IOError):
+            return []
 
-    def _save(self, suggestions_list: list):
-        """Internal: Write suggestions to file."""
+    def _save_json(self, data: List[dict]):
+        """Private helper to write data back to the JSON file."""
         with open(self.file_path, 'w', encoding='utf-8') as f:
-            json.dump(suggestions_list, f, indent=2, ensure_ascii=False)
+            json.dump(data, f, indent=4)
+
+    def get_by_id(self, suggestion_id: int) -> Optional[SuggestionAggregate]:
+        """
+        Fetches a specific suggestion and rehydrates it into an Aggregate.
+        This is what the SuggestionService needs to apply reviews.
+        """
+        all_data = self._load_json()
+        for item in all_data:
+            if item.get('id') == suggestion_id:
+                # Reconstruct the Domain Model from raw Data
+                entity = SuggestionEntity(**item)
+                return SuggestionAggregate(entity)
+        return None
+
+    def get_all_including_deleted(self) -> List[SuggestionAggregate]:
+        """Rehydrates all entries into Domain Aggregates."""
+        raw_data = self._load_json()
+        return [SuggestionAggregate(SuggestionEntity(**item)) for item in raw_data]
+
+    def save(self, aggregate: SuggestionAggregate):
+        """Saves a new suggestion or updates an existing one."""
+        all_data = self._load_json()
+        new_data = aggregate.to_dict()
+
+        # Handle ID assignment for new suggestions if not already set
+        if new_data.get('id') is None:
+            max_id = max([item.get('id', 0) for item in all_data], default=0)
+            new_data['id'] = max_id + 1
+            # Update the entity inside the aggregate so the caller knows the ID
+            aggregate.entity.id = new_data['id']
+
+        found = False
+        for i, item in enumerate(all_data):
+            if item.get('id') == new_data['id']:
+                all_data[i] = new_data
+                found = True
+                break
+        
+        if not found:
+            all_data.append(new_data)
+            
+        self._save_json(all_data)
+        return aggregate

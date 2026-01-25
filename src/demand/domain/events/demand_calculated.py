@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 """Calculate demand score per PLZ based on residents and charging stations."""
 import numpy as np
 import pandas as pd
@@ -32,3 +33,20 @@ def on_demand_calculated(df_stations_count: pd.DataFrame, df_residents_geo: pd.D
     result['demand'] = result['demand'].replace([np.inf, -np.inf], np.nan).fillna(0)
 
     return result
+=======
+from dataclasses import dataclass, field
+from datetime import datetime
+
+@dataclass(frozen=True)
+class DemandCalculatedEvent:
+    """
+    Domain Event: Represents the successful completion of a demand analysis.
+    This fulfills the DDD requirement of separating 'State Changes' from 'Notifications'.
+    """
+    area_count: int
+    occurred_at: datetime = field(default_factory=datetime.now)
+    status: str = "COMPLETED"
+
+    def __str__(self):
+        return f"DemandCalculatedEvent: Analysis of {self.area_count} areas finished at {self.occurred_at}."
+>>>>>>> 607d696 (Revamp project structure using DDD approach)
