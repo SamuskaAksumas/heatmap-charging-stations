@@ -2,14 +2,16 @@
 import subprocess
 import sys
 import re
-
+import os
 
 def run_command(cmd: list[str]) -> str:
     """Run command and return output."""
-    import os
+    # FIX 1: Set PYTHONPATH dynamically for Windows/Linux compatibility
     env = os.environ.copy()
-    env["PYTHONPATH"] = "/workspace/work"
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd="/workspace/work", env=env)
+    env["PYTHONPATH"] = os.getcwd()  # Adds current folder to path so 'src' is found
+    
+    # Run command without hardcoded 'cwd'
+    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
     return result.stdout + result.stderr
 
 
@@ -38,19 +40,24 @@ def get_test_coverage() -> dict:
     }
 
     for line in output.split("\n"):
-        match = re.match(r"(src/\S+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
+        # FIX 2: Updated Regex to accept Windows backslashes [\\/]
+        # Uses re.search to be more robust against leading whitespace
+        match = re.search(r"(src[\\/]\S+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
         if match:
             filepath, stmts, miss, pct = match.groups()
             stmts, miss = int(stmts), int(miss)
             covered = stmts - miss
 
-            if "/domain/" in filepath:
+            # FIX 3: Normalize path to forward slashes for the checks below
+            clean_path = filepath.replace("\\", "/")
+
+            if "/domain/" in clean_path:
                 layer = "Domain"
-            elif "/application/" in filepath:
+            elif "/application/" in clean_path:
                 layer = "Application"
-            elif "/infrastructure/" in filepath:
+            elif "/infrastructure/" in clean_path:
                 layer = "Infrastructure"
-            elif "/presentation/" in filepath:
+            elif "/presentation/" in clean_path:
                 layer = "Presentation"
             else:
                 continue
@@ -112,10 +119,14 @@ def count_lines() -> dict:
 
     for pattern in ["src/**/*.py", "tests/**/*.py"]:
         for filepath in glob.glob(pattern, recursive=True):
-            with open(filepath, "r") as f:
-                lines = len([l for l in f.readlines() if l.strip() and not l.strip().startswith("#")])
-                total_lines += lines
-                total_files += 1
+            try:
+                # Added encoding check for safer reading on Windows
+                with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
+                    lines = len([l for l in f.readlines() if l.strip() and not l.strip().startswith("#")])
+                    total_lines += lines
+                    total_files += 1
+            except Exception:
+                continue
 
     return {"files": total_files, "lines": total_lines}
 
