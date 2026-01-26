@@ -8,8 +8,19 @@ def run_command(cmd: list[str]) -> str:
     """Run command and return output."""
     import os
     env = os.environ.copy()
-    env["PYTHONPATH"] = "/workspace/work"
-    result = subprocess.run(cmd, capture_output=True, text=True, cwd="/workspace/work", env=env)
+    
+    # FIX: Use the current directory on your Mac instead of a hardcoded path
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    env["PYTHONPATH"] = current_dir
+    
+    # FIX: Changed cwd from "/workspace/work" to current_dir
+    result = subprocess.run(
+        cmd, 
+        capture_output=True, 
+        text=True, 
+        cwd=current_dir, 
+        env=env
+    )
     return result.stdout + result.stderr
 
 
