@@ -24,7 +24,7 @@ def _render_residents_layer(m, dframe_analysis):
         vmax=dframe_analysis['Einwohner'].max()
     )
 
-    for idx, row in dframe_analysis.iterrows():
+    for _, row in dframe_analysis.iterrows():
         folium.GeoJson(
             row['geometry'],
             style_function=lambda x, color=color_map(row['Einwohner']): {
@@ -41,7 +41,7 @@ def _render_stations_layer(m, dframe_stations):
 
     color_map = LinearColormap(colors=['yellow', 'red'], vmin=vmin, vmax=vmax)
 
-    for idx, row in dframe_stations.iterrows():
+    for _, row in dframe_stations.iterrows():
         folium.GeoJson(
             row['geometry'],
             style_function=lambda x, color=color_map(row['Number']): {

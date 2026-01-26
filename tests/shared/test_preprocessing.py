@@ -181,6 +181,13 @@ class TestPrepropLstat:
         # Original had '52,52' - should now be '52.52'
         assert ',' not in str(result['Breitengrad'].iloc[0])
 
+    def test_plz_is_integer_not_float(self, sample_stations_raw, sample_geodata):
+        """PLZ should be stored as integer, not float (e.g., 10115 not 10115.0)."""
+        result = preprop_lstat(sample_stations_raw, sample_geodata, pdict)
+
+        assert result['PLZ'].dtype in ['int64', 'int32'], \
+            f"PLZ should be integer, got {result['PLZ'].dtype}"
+
 
 # ==================== RESIDENTS TESTS ====================
 
@@ -208,6 +215,13 @@ class TestPrepropResid:
         result = preprop_resid(sample_residents_raw, sample_geodata, pdict)
 
         assert 'geometry' in result.columns
+
+    def test_plz_is_integer_not_float(self, sample_residents_raw, sample_geodata):
+        """PLZ should be stored as integer, not float (e.g., 10115 not 10115.0)."""
+        result = preprop_resid(sample_residents_raw, sample_geodata, pdict)
+
+        assert result['PLZ'].dtype in ['int64', 'int32'], \
+            f"PLZ should be integer, got {result['PLZ'].dtype}"
 
 
 # ==================== EDGE CASES ====================
