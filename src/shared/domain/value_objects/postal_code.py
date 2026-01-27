@@ -1,9 +1,17 @@
 """PostalCode Value Object - Immutable, self-validating Berlin PLZ."""
 from dataclasses import dataclass
+<<<<<<< HEAD
 
 
 @dataclass(frozen=True)
 class PostalCode:
+=======
+from src.shared.domain.value_objects.value_object import ValueObject  # <- ADD THIS
+
+
+@dataclass(frozen=True)
+class PostalCode(ValueObject):
+>>>>>>> 607d696 (Revamp project structure using DDD approach)
     """Berlin postal code (10000-14200). Immutable and self-validating."""
     value: str
 
