@@ -4,7 +4,7 @@ from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
 from src.suggestion.domain.aggregates.suggestion_aggregate import SuggestionAggregate
 from src.suggestion.domain.events.review_suggestion import ReviewSuggestion
 from src.suggestion.infrastructure.repositories.suggestion_repository import SuggestionRepository
-
+from src.suggestion.domain.value_objects.suggestion_content import SuggestionContent
 
 class SuggestionService:
     """
@@ -15,21 +15,23 @@ class SuggestionService:
     def __init__(self, repository: SuggestionRepository):
         self._repository = repository
 
-    def create_suggestion(self, plz: str, address: str, reason: str) -> int:
+    def create_suggestion(self, address: str, reason: str, plz: str) -> int:
         """
         Use case: User creates a new suggestion.
         """
-        # 1. Create Entity (no business rules here)
+        # 1. VALIDATION: Create the Value Object first.
+        # If address or reason is empty, this raises InvalidSuggestionException immediately.
+        content = SuggestionContent(address=address, reason=reason)
+
+        # 2. CREATE ENTITY: Pass the validated content and PLZ.
         entity = SuggestionEntity(
             plz=plz,
-            address=address,
-            reason=reason
+            address=content.address,
+            reason=content.reason
         )
 
-        # 2. Create Aggregate Root
+        # 3. PROCEED: Create Aggregate and Persist
         aggregate = SuggestionAggregate(entity)
-
-        # 3. Persist Aggregate
         saved_aggregate = self._repository.save(aggregate)
 
         return saved_aggregate.id
