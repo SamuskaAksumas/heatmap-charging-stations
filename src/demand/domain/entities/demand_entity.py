@@ -28,10 +28,3 @@ class DemandEntity(Entity):
         Entity identity used for equality comparison.
         """
         return self.plz.code
-
-    @property
-    def plz_code(self) -> str:
-        """
-        Convenience accessor for presentation / mapping layers.
-        """
-        return self.plz.code
