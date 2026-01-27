@@ -1,51 +1,92 @@
-"""SuggestionService - Coordinates suggestion management workflow."""
 from typing import List, Dict, Any
 
-from src.suggestion.domain.entities.suggestion import ChargingSuggestion
+from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
+from src.suggestion.domain.aggregates.suggestion_aggregate import SuggestionAggregate
+from src.suggestion.domain.events.review_suggestion import ReviewSuggestion
 from src.suggestion.infrastructure.repositories.suggestion_repository import SuggestionRepository
-
+from src.suggestion.domain.value_objects.suggestion_content import SuggestionContent
 
 class SuggestionService:
-    """Application service for managing charging station suggestions."""
+    """
+    Application Service.
+    Coordinates use cases, delegates business rules to the Aggregate Root.
+    """
 
-    def __init__(self, repository: SuggestionRepository) -> None:
+    def __init__(self, repository: SuggestionRepository):
         self._repository = repository
 
-    def get_all_suggestions(self) -> List[Dict[str, Any]]:
-        """Retrieve all visible suggestions (excludes deleted) - for admin view."""
-        return self._repository.get_all()
+    def create_suggestion(self, address: str, reason: str, plz: str) -> int:
+        """
+        Use case: User creates a new suggestion.
+        """
+        # 1. VALIDATION: Create the Value Object first.
+        # If address or reason is empty, this raises InvalidSuggestionException immediately.
+        content = SuggestionContent(address=address, reason=reason)
 
-    def get_suggestions_for_users(self) -> List[Dict[str, Any]]:
-        """Retrieve suggestions visible to users (pending + approved only)."""
-        return self._repository.get_visible_for_users()
+        # 2. CREATE ENTITY: Pass the validated content and PLZ.
+        entity = SuggestionEntity(
+            plz=plz,
+            address=content.address,
+            reason=content.reason
+        )
 
-    def create_suggestion(self, plz: str, address: str, reason: str) -> Dict[str, Any]:
-        """Create a new suggestion (validates via Entity, persists via Repository)."""
-        suggestion = ChargingSuggestion(plz, address, reason)
-        return self._repository.add(suggestion.to_dict())
+        # 3. PROCEED: Create Aggregate and Persist
+        aggregate = SuggestionAggregate(entity)
+        saved_aggregate = self._repository.save(aggregate)
+
+        return saved_aggregate.id
 
     def review_suggestion(
         self,
         suggestion_id: int,
         status: str,
-        reviewer: str = "Admin",
-        notes: str = ""
-    ) -> None:
-        """Review suggestion using Entity's state machine (approve/reject/delete)."""
-        all_suggestions = self._repository.get_all_including_deleted()
+        reviewer: str,
+        notes: str | None = None
+    ) -> bool:
+        """
+        Use case: Admin reviews a suggestion.
+        """
+        # 1. Load Aggregate Root
+        aggregate = self._repository.get_by_id(suggestion_id)
+        if aggregate is None:
+            return False
 
-        for i, suggestion_data in enumerate(all_suggestions):
-            if suggestion_data.get('id') == suggestion_id:
-                entity = ChargingSuggestion.from_dict(suggestion_data)
+        # 2. Domain Logic (inside Aggregate!)
+        aggregate.apply_review(status, reviewer, notes)
 
-                if status == 'approved':
-                    entity.approve(reviewer, notes)
-                elif status == 'rejected':
-                    entity.reject(reviewer, notes)
-                elif status == 'deleted':
-                    entity.delete(reviewer, notes)
+        # 3. Persist updated Aggregate
+        self._repository.save(aggregate)
 
-                all_suggestions[i] = entity.to_dict()
-                break
+        # 4. Domain Event (side effect)
+        ReviewSuggestion(
+            suggestion_id=suggestion_id,
+            new_status=status,
+            reviewer=reviewer
+        )
 
-        self._repository.update(all_suggestions)
+        return True
+
+    def get_all_suggestions(self) -> List[Dict[str, Any]]:
+        """
+        Admin view: returns all non-deleted suggestions.
+        """
+        aggregates = self._repository.get_all_including_deleted()
+
+        return [
+            aggregate.to_dict()
+            for aggregate in aggregates
+            if aggregate.entity.status != "deleted"
+        ]
+
+    def get_suggestions_for_users(self) -> List[Dict[str, Any]]:
+        """
+        User view: returns only pending and approved suggestions.
+        """
+        aggregates = self._repository.get_all_including_deleted()
+        allowed_statuses = {"pending", "approved"}
+
+        return [
+            aggregate.to_dict()
+            for aggregate in aggregates
+            if aggregate.entity.status in allowed_statuses
+        ]

@@ -1,18 +1,17 @@
-"""InMemoryDemandRepository - In-memory storage for testing."""
-from typing import Optional
 import pandas as pd
-
+from typing import Optional
 
 class InMemoryDemandRepository:
-    """In-memory repository for demand analysis (used in tests)."""
+    """Mock repository for testing the Demand Bounded Context."""
+    
+    def __init__(self):
+        # We use a dictionary to simulate a database table
+        self._storage = {}
 
-    def __init__(self) -> None:
-        self._data: Optional[pd.DataFrame] = None
+    def save_analysis(self, df: pd.DataFrame, aggregate_id: str = "berlin_current_analysis"):
+        """Saves the calculated dataframe to memory."""
+        self._storage[aggregate_id] = df
 
-    def get_analysis(self) -> Optional[pd.DataFrame]:
-        """Retrieve stored analysis."""
-        return self._data
-
-    def update_analysis(self, df: pd.DataFrame) -> None:
-        """Store analysis data."""
-        self._data = df
+    def get_analysis(self, aggregate_id: str = "berlin_current_analysis") -> Optional[pd.DataFrame]:
+        """Retrieves the dataframe from memory."""
+        return self._storage.get(aggregate_id)

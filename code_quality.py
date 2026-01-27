@@ -2,16 +2,25 @@
 import subprocess
 import sys
 import re
-import os
+
 
 def run_command(cmd: list[str]) -> str:
     """Run command and return output."""
-    # FIX 1: Set PYTHONPATH dynamically for Windows/Linux compatibility
+    import os
     env = os.environ.copy()
-    env["PYTHONPATH"] = os.getcwd()  # Adds current folder to path so 'src' is found
     
-    # Run command without hardcoded 'cwd'
-    result = subprocess.run(cmd, capture_output=True, text=True, env=env)
+    # FIX: Use the current directory on your Mac instead of a hardcoded path
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    env["PYTHONPATH"] = current_dir
+    
+    # FIX: Changed cwd from "/workspace/work" to current_dir
+    result = subprocess.run(
+        cmd, 
+        capture_output=True, 
+        text=True, 
+        cwd=current_dir, 
+        env=env
+    )
     return result.stdout + result.stderr
 
 
@@ -40,24 +49,19 @@ def get_test_coverage() -> dict:
     }
 
     for line in output.split("\n"):
-        # FIX 2: Updated Regex to accept Windows backslashes [\\/]
-        # Uses re.search to be more robust against leading whitespace
-        match = re.search(r"(src[\\/]\S+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
+        match = re.match(r"(src/\S+\.py)\s+(\d+)\s+(\d+)\s+(\d+)%", line)
         if match:
             filepath, stmts, miss, pct = match.groups()
             stmts, miss = int(stmts), int(miss)
             covered = stmts - miss
 
-            # FIX 3: Normalize path to forward slashes for the checks below
-            clean_path = filepath.replace("\\", "/")
-
-            if "/domain/" in clean_path:
+            if "/domain/" in filepath:
                 layer = "Domain"
-            elif "/application/" in clean_path:
+            elif "/application/" in filepath:
                 layer = "Application"
-            elif "/infrastructure/" in clean_path:
+            elif "/infrastructure/" in filepath:
                 layer = "Infrastructure"
-            elif "/presentation/" in clean_path:
+            elif "/presentation/" in filepath:
                 layer = "Presentation"
             else:
                 continue
@@ -119,14 +123,10 @@ def count_lines() -> dict:
 
     for pattern in ["src/**/*.py", "tests/**/*.py"]:
         for filepath in glob.glob(pattern, recursive=True):
-            try:
-                # Added encoding check for safer reading on Windows
-                with open(filepath, "r", encoding="utf-8", errors="ignore") as f:
-                    lines = len([l for l in f.readlines() if l.strip() and not l.strip().startswith("#")])
-                    total_lines += lines
-                    total_files += 1
-            except Exception:
-                continue
+            with open(filepath, "r") as f:
+                lines = len([l for l in f.readlines() if l.strip() and not l.strip().startswith("#")])
+                total_lines += lines
+                total_files += 1
 
     return {"files": total_files, "lines": total_lines}
 

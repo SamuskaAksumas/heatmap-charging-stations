@@ -14,51 +14,56 @@ def demand_setup():
     "people, stations, expected_demand",
     [
         (500, 0, 500.0),   # Rule: If 0 stations, demand = total residents
-        (500, 1, 500.0),   # Rule: 500 / 1
-        (500, 5, 100.0),   # Rule: 500 / 5
-        (0, 10, 0.0),      # Rule: 0 / 10
+        (500, 1, 500.0),   # Rule: 500 / 1 = 500.0
+        (500, 5, 100.0),   # Rule: 500 / 5 = 100.0
+        (0, 10, 0.0),      # Rule: 0 / 10 = 0.0
     ],
 )
 def test_demand_service_integration(demand_setup, people, stations, expected_demand):
     # 1. ARRANGE
     service, repo = demand_setup
     
+    # Matching your Aggregate's expected columns: 'PLZ', 'Number'
     df_stations = pd.DataFrame({
         'PLZ': ['12345'],
         'Number': [stations]
     })
 
+    # Matching your Aggregate's expected columns: 'PLZ', 'Einwohner'
     df_residents = pd.DataFrame({
         'PLZ': ['12345'],
-        'Einwohner': [people],
-        'geometry': [None]
+        'Einwohner': [people]
     })
 
     # 2. ACT
-    # We call the SERVICE, which calls the Domain Event, which updates the REPO
+    # The service coordinates the Aggregate which uses the DemandScore Value Object
     result = service.calculate_demand(df_stations, df_residents)
 
     # 3. ASSERT - Logic check
     assert result.iloc[0]['PLZ'] == '12345'
+    # Your aggregate maps score_vo.value to the 'demand' key in the dictionary
     assert pytest.approx(result.iloc[0]['demand']) == expected_demand
 
-    # 4. ASSERT - Repository check (Crucial for TDD)
-    # Ensure the repository actually 'holds' the data now
-    stored_data = repo.get_analysis()
-    assert stored_data is not None
-    assert pytest.approx(stored_data.iloc[0]['demand']) == expected_demand
+    # 4. ASSERT - Repository check
+    stored_aggregate = repo.get_analysis() 
+    assert stored_aggregate is not None
+    
+    # Access the DataFrame stored inside the Aggregate's raw_results attribute
+    # Since stored_aggregate is a DemandAggregate object, we get the data from its property
+    stored_df = stored_aggregate.raw_results
+    
+    assert stored_df is not None
+    assert pytest.approx(stored_df.iloc[0]['demand']) == expected_demand
 
 def test_demand_service_get_latest(demand_setup):
     service, repo = demand_setup
 
-    # Create dummy data
     df_stations = pd.DataFrame({'PLZ': ['10115'], 'Number': [2]})
-    df_residents = pd.DataFrame({'PLZ': ['10115'], 'Einwohner': [1000], 'geometry': [None]})
+    df_residents = pd.DataFrame({'PLZ': ['10115'], 'Einwohner': [1000]})
 
-    # First, calculate it
     service.calculate_demand(df_stations, df_residents)
 
-    # Then, use the Query function (get_latest_results)
+    # Verifies the 'Query' capability of the service
     latest = service.get_latest_results()
 
     assert latest is not None
@@ -69,10 +74,9 @@ def test_demand_service_get_latest(demand_setup):
 # ==================== EDGE CASE TESTS ====================
 
 class TestDemandEdgeCases:
-    """Edge Case tests - boundary conditions."""
+    """Edge Case tests - maintaining full coverage of boundary conditions."""
 
     def test_multiple_plz_areas(self, demand_setup):
-        """Test demand calculation for multiple PLZ areas."""
         service, repo = demand_setup
 
         df_stations = pd.DataFrame({
@@ -81,8 +85,7 @@ class TestDemandEdgeCases:
         })
         df_residents = pd.DataFrame({
             'PLZ': ['10115', '10117', '10119'],
-            'Einwohner': [1000, 500, 2000],
-            'geometry': [None, None, None]
+            'Einwohner': [1000, 500, 2000]
         })
 
         result = service.calculate_demand(df_stations, df_residents)
@@ -90,39 +93,32 @@ class TestDemandEdgeCases:
         assert len(result) == 3
         # 10115: 1000/5 = 200
         assert pytest.approx(result[result['PLZ'] == '10115'].iloc[0]['demand']) == 200.0
-        # 10117: 500/0 = 500 (residents only)
+        # 10117: 500/0 = 500 (Old logic: stations=0 returns inhabitants)
         assert pytest.approx(result[result['PLZ'] == '10117'].iloc[0]['demand']) == 500.0
         # 10119: 2000/10 = 200
         assert pytest.approx(result[result['PLZ'] == '10119'].iloc[0]['demand']) == 200.0
 
     def test_very_high_demand(self, demand_setup):
-        """Test with very high population and few stations."""
         service, repo = demand_setup
 
         df_stations = pd.DataFrame({'PLZ': ['10115'], 'Number': [1]})
-        df_residents = pd.DataFrame({
-            'PLZ': ['10115'],
-            'Einwohner': [100000],
-            'geometry': [None]
-        })
+        df_residents = pd.DataFrame({'PLZ': ['10115'], 'Einwohner': [100000]})
 
         result = service.calculate_demand(df_stations, df_residents)
         assert pytest.approx(result.iloc[0]['demand']) == 100000.0
 
     def test_plz_only_in_residents(self, demand_setup):
-        """Test PLZ that exists only in residents data (no stations)."""
+        """Ensures PLZs missing from station data default to 0 stations (and thus full inhabitant demand)."""
         service, repo = demand_setup
 
         df_stations = pd.DataFrame({'PLZ': ['10115'], 'Number': [5]})
         df_residents = pd.DataFrame({
-            'PLZ': ['10115', '10117'],  # 10117 has no stations
-            'Einwohner': [1000, 500],
-            'geometry': [None, None]
+            'PLZ': ['10115', '10117'], 
+            'Einwohner': [1000, 500]
         })
 
         result = service.calculate_demand(df_stations, df_residents)
 
-        # 10117 should have demand = residents (no stations = 0)
         plz_10117 = result[result['PLZ'] == '10117']
         assert len(plz_10117) == 1
         assert pytest.approx(plz_10117.iloc[0]['demand']) == 500.0
@@ -131,25 +127,15 @@ class TestDemandEdgeCases:
 # ==================== ERROR SCENARIO TESTS ====================
 
 class TestDemandErrorScenarios:
-    """Error Scenario tests - handling edge cases gracefully."""
-
     def test_get_latest_without_calculation(self, demand_setup):
-        """Test getting results before any calculation."""
         service, repo = demand_setup
-
         result = service.get_latest_results()
         assert result is None
 
     def test_empty_dataframes(self, demand_setup):
-        """Test with empty input DataFrames."""
         service, repo = demand_setup
-
         df_stations = pd.DataFrame({'PLZ': [], 'Number': []})
-        df_residents = pd.DataFrame({
-            'PLZ': [],
-            'Einwohner': [],
-            'geometry': []
-        })
+        df_residents = pd.DataFrame({'PLZ': [], 'Einwohner': []})
 
         result = service.calculate_demand(df_stations, df_residents)
         assert len(result) == 0
