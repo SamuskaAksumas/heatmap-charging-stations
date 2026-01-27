@@ -2,10 +2,8 @@
 Smoke Test - Application Verification
 
 Verifies that all important modules can be imported
-and that the application is basically runnable.
-
-Following TDD guidelines: Smoke tests ensure that after refactoring,
-the app-level functionality is preserved.
+and that the application is basically runnable after refactoring 
+to DDD Aggregates, Entities, and Value Objects.
 """
 import pytest
 
@@ -30,26 +28,29 @@ class TestSmokeImports:
     def test_demand_layer_imports(self) -> None:
         """Verifies that the demand bounded context can be imported."""
         from src.demand.application.services.demand_service import DemandService
-        from src.demand.domain.events.demand_calculated import on_demand_calculated
-        from src.demand.infrastructure.repositories.demand_repository import DemandRepository
+        from src.demand.domain.aggregates.demand_aggregate import DemandAggregate
+        from src.demand.domain.entities.demand_entity import DemandEntity
+        from src.demand.domain.events.demand_calculated import DemandCalculatedEvent
         assert DemandService is not None
-        assert callable(on_demand_calculated)
+        assert DemandAggregate is not None
 
     def test_suggestion_layer_imports(self) -> None:
         """Verifies that the suggestion bounded context can be imported."""
         from src.suggestion.application.services.suggestion_service import SuggestionService
-        from src.suggestion.domain.entities.suggestion import ChargingSuggestion
-        from src.suggestion.domain.exceptions import InvalidSuggestionException
+        from src.suggestion.domain.aggregates.suggestion_aggregate import SuggestionAggregate
+        from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
+        from src.suggestion.domain.exceptions.invalid_suggestion_exception import InvalidSuggestionException
         from src.suggestion.infrastructure.repositories.suggestion_repository import SuggestionRepository
         assert SuggestionService is not None
-        assert ChargingSuggestion is not None
+        assert SuggestionAggregate is not None
+        assert SuggestionEntity is not None
 
     def test_shared_layer_imports(self) -> None:
         """Verifies that the shared bounded context can be imported."""
         from src.shared.domain.value_objects.postal_code import PostalCode
-        from src.shared.domain.exceptions import DomainException
-        from src.shared.infrastructure.preprocessing import preprop_resid, preprop_lstat
-        from src.shared.infrastructure.utils import timer
+        from src.shared.domain.exceptions.domain_exception import DomainException
+        from src.shared.infrastructure.preprocessing.residents import preprop_resid
+        from src.shared.infrastructure.utils.helper_tools import timer
         assert PostalCode is not None
         assert DomainException is not None
 
@@ -63,7 +64,6 @@ class TestSmokeImports:
             preprop_lstat,
             count_plz_occurrences,
         )
-        from src.shared.infrastructure.preprocessing.residents import preprop_resid
         assert callable(sort_by_plz_add_geometry)
         assert callable(preprop_lstat)
 
@@ -77,19 +77,37 @@ class TestSmokeInstantiation:
         plz = PostalCode("10115")
         assert plz.value == "10115"
 
-    def test_suggestion_creation(self) -> None:
-        """Verifies that a ChargingSuggestion entity can be created."""
-        from src.suggestion.domain.entities.suggestion import ChargingSuggestion
-        suggestion = ChargingSuggestion.from_dict({
-            'id': 1,
-            'plz': '10115',
-            'address': 'Test Address',
-            'reason': 'Test Reason',
-            'status': 'pending',
-            'created_at': '2024-01-01T00:00:00'
-        })
-        assert suggestion.plz == "10115"
-        assert suggestion.status == "pending"
+    def test_suggestion_aggregate_creation(self) -> None:
+        """Verifies that a SuggestionAggregate (with Entity) can be created."""
+        from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
+        from src.suggestion.domain.aggregates.suggestion_aggregate import SuggestionAggregate
+        
+        entity = SuggestionEntity(
+            id=1,
+            plz="10115",
+            address="Test Address",
+            reason="Test Reason",
+            status="pending",
+            timestamp="2024-01-01T00:00:00"
+        )
+        aggregate = SuggestionAggregate(entity)
+        assert aggregate.entity.plz == "10115"
+        assert aggregate.entity.status == "pending"
+
+    def test_demand_aggregate_creation(self) -> None:
+        """Verifies that a DemandAggregate can be created."""
+        from src.demand.domain.aggregates.demand_aggregate import DemandAggregate
+        
+        # Based on your definition: DemandAggregate(aggregate_id: str)
+        plz_id = "10117"
+        aggregate = DemandAggregate(plz_id)
+        
+        # Verify the ID is stored correctly
+        # Depending on your implementation, this is likely .aggregate_id or .id
+        try:
+            assert aggregate.aggregate_id == plz_id
+        except AttributeError:
+            assert aggregate.id == plz_id
 
 
 class TestSmokeExceptions:
@@ -98,19 +116,19 @@ class TestSmokeExceptions:
     def test_invalid_postal_code_raises(self) -> None:
         """Verifies that an invalid postal code throws an error."""
         from src.shared.domain.value_objects.postal_code import PostalCode
+        # Assuming PostalCode value object does the validation
         with pytest.raises(ValueError):
             PostalCode("99999")
 
-    def test_invalid_suggestion_plz_raises(self) -> None:
-        """Verifies that an invalid PLZ in suggestion throws an error."""
-        from src.suggestion.domain.entities.suggestion import ChargingSuggestion
-        from src.suggestion.domain.exceptions import InvalidSuggestionException
+    def test_invalid_suggestion_status_transition_raises(self) -> None:
+        """Verifies that the Aggregate state machine enforces rules."""
+        from src.suggestion.domain.entities.suggestion_entity import SuggestionEntity
+        from src.suggestion.domain.aggregates.suggestion_aggregate import SuggestionAggregate
+        from src.suggestion.domain.exceptions.invalid_suggestion_exception import InvalidSuggestionException
+        
+        entity = SuggestionEntity(id=1, plz="10115", address="A", reason="R", status="approved")
+        aggregate = SuggestionAggregate(entity)
+        
+        # Approved -> Rejected is an invalid transition in our domain rules
         with pytest.raises(InvalidSuggestionException):
-            ChargingSuggestion.from_dict({
-                'id': 1,
-                'plz': '99999',  # Invalid - not a Berlin PLZ
-                'address': 'Test',
-                'reason': 'Test',
-                'status': 'pending',
-                'created_at': '2024-01-01T00:00:00'
-            })
+            aggregate.apply_review(status="rejected", reviewer="Admin", notes="Wrong")

@@ -22,7 +22,7 @@ This project follows **Domain-Driven Design (DDD)** principles with a layered ar
         |
         v
 +------------------+
-|     Domain       |  <- Entities, Value Objects, Exceptions
+|     Domain       |  <- Aggregates, Entities, Events, Value Objects, Exceptions
 +------------------+
         |
         v
@@ -53,6 +53,8 @@ For detailed architecture diagrams, see `docs/`.
 │   │
 │   ├── shared/                          # Shared Bounded Context
 │   │   ├── domain/
+│   │   │   ├── aggregates/              # SharedAggregate (Calculates density)
+│   │   │   ├── entities/                # SharedEntity
 │   │   │   ├── value_objects/           # PostalCode (validates Berlin PLZ)
 │   │   │   ├── events/                  # Data processing functions
 │   │   │   └── exceptions/              # DomainException
@@ -63,13 +65,21 @@ For detailed architecture diagrams, see `docs/`.
 │   │       └── utils/                   # helper_tools.py (timer)
 │   │
 │   ├── demand/                          # Demand Bounded Context
-│   │   ├── domain/events/               # on_demand_calculated(), display_demand()
+│   |   ├── domain/
+│   │   │   ├── aggregates/              # DemandAggregate (Calculates density)
+│   │   │   ├── entities/                # DemandEntity
+│   │   │   ├── events/                  # demand_calculated, display_demand
+│   │   │   ├── value_objects/           # DemandScore
+│   |   │   └── exceptions/              # InvalidSuggestionException
 │   │   ├── application/services/        # demand_service.py
 │   │   └── infrastructure/repositories/ # demand_repository.py (in-memory cache)
 │   │
 │   └── suggestion/                      # Suggestion Bounded Context
 │       ├── domain/
-│       │   ├── entities/                # ChargingSuggestion (Entity + State Machine)
+│       │   ├── aggregates/              # SuggestionAggregate (State Machine Root)
+│       │   ├── entities/                # SuggestionEntity (Data structure)
+│       │   ├── events/                  # save_suggestion, load_suggestion, review_suggestion
+│       │   ├── value_objects/           # ReviewNotes, SuggestionStatus
 │       │   └── exceptions/              # InvalidSuggestionException
 │       ├── application/services/        # suggestion_service.py
 │       └── infrastructure/repositories/ # suggestion_repository.py (JSON file)
@@ -110,29 +120,23 @@ For detailed architecture diagrams, see `docs/`.
 #### ii. Demand Context (`src/demand/`)
 *Brain: Calculates where new charging stations are needed*
 
-- **Domain Functions**:
-  - `on_demand_calculated()` - Calculates demand = residents / stations per PLZ
-  - `display_demand()` - Renders heatmap layer (yellow → red)
+- **Aggregates**: `DemandAggregate` manages the calculation of infrastructure needs for a specific PLZ.
+- **Value Objects**: Handles domain-specific types like `DemandScore`, ensuring calculations follow business rounding rules.
+- **Events**: Triggers `on_demand_calculated()` and `display_demand()` once residents and station data are successfully merged.
 - **Service**: `DemandService` - Orchestrates calculation and caching
 - **Repository**: `DemandRepository` - In-memory cache for results
 
 #### iii. Suggestion Context (`src/suggestion/`)
 *Interaction: Manages user suggestions for new charging locations*
 
-- **Entity**: `ChargingSuggestion` - Domain model with State Machine:
-  - Status transitions: `pending` → `approved`/`rejected` → `deleted`
-  - Methods: `approve()`, `reject()`, `delete()`, `can_transition_to()`
-  - Validates PLZ using shared `PostalCode` value object
+- **Aggregates**: `SuggestionAggregate` acts as the Root for all suggestion interactions.
+- **Entities**: `SuggestionEntity` holds the mutable state (address, reason).
+- **Events**: Dispatches `ReviewSuggestion` events to notify the system of status changes.
 - **Exception**: `InvalidSuggestionException` - For validation and transition errors
-- **Service**: `SuggestionService` - Thin orchestrator for CRUD operations:
-  - `get_suggestions_for_users()` - Returns pending + approved only (user view)
-  - `get_all_suggestions()` - Returns all except deleted (admin view)
-  - `review_suggestion()` - Approve, reject, or delete suggestions
-- **Repository**: `SuggestionRepository` - JSON file persistence with:
-  - `add()` - Assigns ID, timestamp, status='pending'
-  - `get_visible_for_users()` - Returns pending + approved (user view)
-  - `get_all()` - Returns all except deleted (admin view)
-  - `update()` - Saves changes after review
+- **Value Objects**: Includes domain types such as `Status`, `ReviewNotes`, and uses the shared `PostalCode` to ensure data integrity and immutability.
+- **State Machine**: The Aggregate enforces the transition lifecycle (**Pending** → **Approved** / **Rejected** → **Deleted**).
+- **Service (Application)**: `SuggestionService` orchestrates the use cases. It fetches data via the repository, rehydrates the `SuggestionAggregate`, executes domain logic, and persists the result.
+- **Repository (Infrastructure)**: `SuggestionRepository` handles the technical details of JSON persistence. It maps raw data to domain objects and ensures that IDs and timestamps are generated correctly upon creation.
 
 **User vs Admin Views:**
 - **Users**: See only `pending` and `approved` suggestions (rejected hidden)
@@ -140,6 +144,9 @@ For detailed architecture diagrams, see `docs/`.
 
 ### 4. Testing (`tests/`)
 - **TDD approach**: Red-Green-Refactor cycle
+- **Aggregate Testing**: Unit tests target the `SuggestionAggregate` directly to verify business rules (like the State Machine) in isolation from files or databases.
+- **Service & Persistence Testing**: Integration tests verify that the `SuggestionService` correctly interacts with the `SuggestionRepository` to save and load data without corruption.
+- **State Transition Testing**: Specialized tests verify that the system correctly raises an `InvalidSuggestionException` when illegal transitions are attempted (e.g., trying to "re-delete" a suggestion).
 - **51 tests** covering:
   - Unit tests with `@pytest.mark.parametrize` for edge cases
   - Smoke tests for app-level verification
