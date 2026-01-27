@@ -60,7 +60,7 @@ class SuggestionService:
         # 4. Domain Event (side effect)
         ReviewSuggestion(
             suggestion_id=suggestion_id,
-            status=status,
+            new_status=status,
             reviewer=reviewer
         )
 

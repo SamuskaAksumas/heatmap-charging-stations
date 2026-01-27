@@ -48,11 +48,10 @@ class SuggestionAggregate(AggregateRoot):
             )
 
         # Rule 3: Pending suggestions can only be approved or rejected
-        if current_status == "pending" and status not in {"approved", "rejected"}:
+        if current_status == "pending" and status not in {"approved", "rejected", "deleted"}:
             raise InvalidSuggestionException(
                 f"Invalid transition from '{current_status}' to '{status}'."
             )
-
         # Apply transition
         self._apply_state_change(status, reviewer, notes)
 

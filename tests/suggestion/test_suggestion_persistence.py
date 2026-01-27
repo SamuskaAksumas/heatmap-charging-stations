@@ -3,6 +3,10 @@ from src.suggestion.application.services.suggestion_service import SuggestionSer
 from src.suggestion.infrastructure.repositories.in_memory_suggestion_repository import InMemorySuggestionRepository
 from src.suggestion.domain.exceptions import InvalidSuggestionException
 
+# Added Value Object imports
+from src.shared.domain.value_objects.postal_code import PostalCode
+from src.suggestion.domain.value_objects.suggestion_content import SuggestionContent
+
 @pytest.fixture
 def suggestion_setup():
     """Fixture to provide a clean service and in-memory repo for every test."""
@@ -12,13 +16,20 @@ def suggestion_setup():
 
 def test_create_suggestion_integration(suggestion_setup):
     service, repo = suggestion_setup
-    plz, address, reason = "10117", "Friedrichstraße", "High traffic area"
+    
+    # Using Value Objects here to validate logic before passing to service
+    plz_vo = PostalCode("10117")
+    content_vo = SuggestionContent(address="Friedrichstraße", reason="High traffic area")
 
-    service.create_suggestion(plz, address, reason)
+    # FIXED: Use keyword arguments to ensure data maps to the correct Entity fields
+    service.create_suggestion(
+        plz=plz_vo.value, 
+        address=content_vo.address, 
+        reason=content_vo.reason
+    )
 
     all_suggestions = repo.get_all_including_deleted()
     assert len(all_suggestions) == 1
-    # Check the Aggregate's internal entity
     suggestion = all_suggestions[0].entity
     assert suggestion.plz == "10117"
     assert suggestion.address == "Friedrichstraße"
@@ -28,7 +39,8 @@ def test_create_suggestion_integration(suggestion_setup):
 
 def test_review_suggestion_logic(suggestion_setup):
     service, repo = suggestion_setup
-    service.create_suggestion("10115", "Mitte", "Need power")
+    # FIXED: Keywords prevent "High traffic area" from entering the PLZ field
+    service.create_suggestion(plz="10115", address="Mitte", reason="Need power")
     suggestion_id = repo.get_all_including_deleted()[0].entity.id
 
     service.review_suggestion(suggestion_id, status="approved", reviewer="Admin", notes="Valid point")
@@ -43,9 +55,9 @@ def test_review_suggestion_logic(suggestion_setup):
 class TestSuggestionEdgeCases:
     def test_multiple_suggestions(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Address 1", "Reason 1")
-        service.create_suggestion("10117", "Address 2", "Reason 2")
-        service.create_suggestion("10119", "Address 3", "Reason 3")
+        service.create_suggestion(plz="10115", address="Address 1", reason="Reason 1")
+        service.create_suggestion(plz="10117", address="Address 2", reason="Reason 2")
+        service.create_suggestion(plz="10119", address="Address 3", reason="Reason 3")
 
         all_suggestions = repo.get_all_including_deleted()
         assert len(all_suggestions) == 3
@@ -55,7 +67,7 @@ class TestSuggestionEdgeCases:
 
     def test_reject_suggestion(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Bad Location", "Not good")
+        service.create_suggestion(plz="10115", address="Bad Location", reason="Not good")
         suggestion_id = repo.get_all_including_deleted()[0].entity.id
 
         service.review_suggestion(suggestion_id, status="rejected", reviewer="Admin", notes="Invalid location")
@@ -66,14 +78,12 @@ class TestSuggestionEdgeCases:
 
     def test_get_all_suggestions_filters_deleted(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Address 1", "Reason 1")
-        service.create_suggestion("10117", "Address 2", "Reason 2")
+        service.create_suggestion(plz="10115", address="Address 1", reason="Reason 1")
+        service.create_suggestion(plz="10117", address="Address 2", reason="Reason 2")
 
-        # Admin deletes the first one
         all_data = repo.get_all_including_deleted()
         service.review_suggestion(all_data[0].entity.id, status="deleted", reviewer="Admin", notes="Delete")
 
-        # get_all_suggestions (Admin View) should filter out deleted
         visible = service.get_all_suggestions()
         assert len(visible) == 1
         assert visible[0]['plz'] == "10117"
@@ -87,7 +97,6 @@ class TestSuggestionErrorScenarios:
 
     def test_review_nonexistent_suggestion(self, suggestion_setup):
         service, repo = suggestion_setup
-        # Should return False or handle gracefully
         result = service.review_suggestion(999, status="approved", reviewer="Admin", notes="Test")
         assert result is False
         assert len(repo.get_all_including_deleted()) == 0
@@ -97,18 +106,18 @@ class TestSuggestionErrorScenarios:
 class TestSuggestionDomainRules:
     def test_suggestion_starts_with_pending_status(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test Address", "Test Reason")
+        service.create_suggestion(plz="10115", address="Test Address", reason="Test Reason")
         assert repo.get_all_including_deleted()[0].entity.status == "pending"
 
     def test_suggestion_gets_timestamp(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test Address", "Test Reason")
+        service.create_suggestion(plz="10115", address="Test Address", reason="Test Reason")
         assert repo.get_all_including_deleted()[0].entity.timestamp is not None
 
     def test_suggestion_gets_incremental_id(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "A1", "R1")
-        service.create_suggestion("10117", "A2", "R2")
+        service.create_suggestion(plz="10115", address="A1", reason="R1")
+        service.create_suggestion(plz="10117", address="A2", reason="R2")
         all_aggs = repo.get_all_including_deleted()
         assert all_aggs[0].entity.id == 1
         assert all_aggs[1].entity.id == 2
@@ -118,7 +127,7 @@ class TestSuggestionDomainRules:
 class TestSuggestionStateMachine:
     def test_cannot_approve_already_approved(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test", "Reason")
+        service.create_suggestion(plz="10115", address="Test", reason="Reason")
         suggestion_id = repo.get_all_including_deleted()[0].entity.id
 
         service.review_suggestion(suggestion_id, status="approved", reviewer="Admin", notes="Ok")
@@ -127,7 +136,7 @@ class TestSuggestionStateMachine:
 
     def test_cannot_reject_already_approved(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test", "Reason")
+        service.create_suggestion(plz="10115", address="Test", reason="Reason")
         suggestion_id = repo.get_all_including_deleted()[0].entity.id
 
         service.review_suggestion(suggestion_id, status="approved", reviewer="Admin", notes="Ok")
@@ -136,7 +145,7 @@ class TestSuggestionStateMachine:
 
     def test_can_delete_approved_suggestion(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test", "Reason")
+        service.create_suggestion(plz="10115", address="Test", reason="Reason")
         suggestion_id = repo.get_all_including_deleted()[0].entity.id
 
         service.review_suggestion(suggestion_id, status="approved", reviewer="Admin", notes="Ok")
@@ -148,9 +157,9 @@ class TestSuggestionStateMachine:
 class TestUserVisibility:
     def test_get_suggestions_for_users_excludes_rejected(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "P", "R1")
-        service.create_suggestion("10117", "A", "R2")
-        service.create_suggestion("10119", "R", "R3")
+        service.create_suggestion(plz="10115", address="P", reason="R1")
+        service.create_suggestion(plz="10117", address="A", reason="R2")
+        service.create_suggestion(plz="10119", address="R", reason="R3")
 
         all_aggs = repo.get_all_including_deleted()
         service.review_suggestion(all_aggs[1].entity.id, status="approved", reviewer="Admin", notes="Ok")
@@ -163,8 +172,8 @@ class TestUserVisibility:
 
     def test_get_suggestions_for_users_excludes_deleted(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "A1", "R1")
-        service.create_suggestion("10117", "A2", "R2")
+        service.create_suggestion(plz="10115", address="A1", reason="R1")
+        service.create_suggestion(plz="10117", address="A2", reason="R2")
 
         service.review_suggestion(1, status="deleted", reviewer="Admin", notes="Del")
         user_visible = service.get_suggestions_for_users()
@@ -176,16 +185,14 @@ class TestUserVisibility:
 class TestDeleteFunctionality:
     def test_delete_pending_suggestion(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test", "Reason")
+        service.create_suggestion(plz="10115", address="Test", reason="Reason")
         service.review_suggestion(1, status="deleted", reviewer="Admin", notes="X")
         assert repo.get_all_including_deleted()[0].entity.status == "deleted"
 
     def test_cannot_delete_already_deleted(self, suggestion_setup):
         service, repo = suggestion_setup
-        service.create_suggestion("10115", "Test", "Reason")
+        service.create_suggestion(plz="10115", address="Test", reason="Reason")
         service.review_suggestion(1, status="deleted", reviewer="Admin", notes="X")
         
-        # This will fail because the Aggregate's apply_review logic should 
-        # prevent transitions from 'deleted' to 'deleted' if defined.
         with pytest.raises(InvalidSuggestionException):
             service.review_suggestion(1, status="deleted", reviewer="Admin", notes="X")
